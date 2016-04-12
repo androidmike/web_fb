@@ -1,63 +1,73 @@
 body {
   padding: 0;
+  font-family: 'Lato', sans-serif;
 }
 
 .page-wrapper {
-  max-width:550px;
+  max-width: 550px;
   margin-right: auto;
   margin-left: auto;
-  padding:15px;
+  padding: 15px;
 }
 
 .page-wrapper .logo-img {
-  margin-top:-10px;
+  margin-top: -10px;
 }
 
-
 .main {
-  position:absolute;
-  top:0;
-  left:0;
-  height:100%;
-  width:100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
 }
 
 .sidebar {
-  display:inline-block;
-  width:19.5%;
+  display: inline-block;
+  width: 19.5%;
   vertical-align: top;
-  height:100%;
-  background:#4d394b;
-  position:relative;
-  overflow-y:scroll;
-  padding-bottom:100px;
+  height: 100%;
+  background: #faf4f9;
+  position: relative;
+  overflow-y: scroll;
+  padding-bottom: 100px;
+
 }
 
 .sidebar .slack-name {
-  background:#3E313C;
-  padding:15px 0px 15px 15px;
+  /*background: #8f1e78;*/
+  /*padding: 5px 12px 5px 12px;*/
+  /*font-size: 18px;*/
+  /*text-transform: uppercase;*/
+  /*color: #ffffff;*/
+  /*font-weight: 300;*/
+  /*letter-spacing: 2px;*/
 }
 
-.sidebar .slack-name h2{
-  color:#fff;
-  font-size:18px;
-  font-weight:bold;
-  margin-top:0px;
-  margin-bottom:0px;
+.sidebar .slack-name h2 {
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 0px;
+  margin-bottom: 0px;
 }
 
 .sidebar .channel-list {
-  margin-top:20px;
-  background:#4d394b;
-  position:relative;
+  margin-top: 20px;
+  background: #faf4f9;
+  position: relative;
+
 }
 
-.sidebar .channel-list .channel a{
-  display:block;
-  color:rgba(255,255,255,0.6);
-  padding:3px 0px 3px 15px;
-  width:90%;
-  font-weight:300;
+.sidebar .channel-list .channel a {
+  display: block;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 3px 0px 3px 15px;
+  font-weight: 300;
+
+  font-size: 15px;
+  padding: 10px 27px;
+  cursor: pointer;
 
   -webkit-border-top-right-radius: 4px;
   -webkit-border-bottom-right-radius: 4px;
@@ -65,16 +75,18 @@ body {
   -moz-border-radius-bottomright: 4px;
   border-top-right-radius: 4px;
   border-bottom-right-radius: 4px;
+  color: #000000;
 }
 
-.sidebar .channel-list .channel a:hover{
+.sidebar .channel-list .channel a:hover {
   text-decoration: none;
-  background:#3E313C;
+  background: #f5eaf3;
+  color: #000000;
 }
 
-.sidebar .channel-list .channel a.selected{
-  background:#4c9689;
-  color:#fff;
+.sidebar .channel-list .channel a.selected {
+  background: #ffffff;
+  color: #000000;
   text-decoration: none !important;
 }
 
@@ -83,49 +95,49 @@ body {
 }
 
 .sidebar .channel-list .list-head {
-  margin-top:10px;
-  color: #fff;
+  margin-top: 10px;
+  color: #333;
   font-weight: bold;
   margin-left: 10px;
   text-transform: uppercase;
 }
 
 .sidebar .my-info {
-  position:fixed;
-  bottom:0;
-  padding:15px;
-  background:#3E313C;
-  width:19.5%;
+  position: fixed;
+  bottom: 0;
+  padding: 15px;
+  background: #999;
+  width: 19.5%;
 }
 
 .sidebar .my-info .user-pic {
   display: inline-block;
   vertical-align: top;
-  width:44px;
-  height:44px;
-  border-radius:4px;
+  width: 44px;
+  height: 44px;
+  border-radius: 4px;
 }
 
 .sidebar .my-info .user-info {
-  padding-left:5px;
+  padding-left: 5px;
   display: inline-block;
   vertical-align: top;
 }
 
 .sidebar .my-info .user-info .user-name {
-  color:#fff;
-  font-size:16px;
-  font-weight:bold;
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
 }
 
 .sidebar .my-info .user-info .options {
-  color:#999;
-  font-size:12px;
+  color: #ccc;
+  font-size: 12px;
 }
 
-.sidebar .my-info .user-info .options a{
-  color:#999;
-  font-size:12px;
+.sidebar .my-info .user-info .options a {
+  color: #ccc;
+  font-size: 12px;
 }
 
 .sidebar .presence {
@@ -142,49 +154,75 @@ body {
   background: #99d04a;
 }
 
-.message-pane {
-  display:inline-block;
+.note-pane {
+  display: inline-block;
   vertical-align: top;
-  height:100%;
-  width:80%;
-  overflow-y:scroll;
-  padding:55px 15px 65px 15px;
+  height: 100%;
+  width: 30%;
+  overflow-y: scroll;
+  padding: 55px 15px 65px 15px;
+}
+
+.message-pane {
+  display: inline-block;
+  vertical-align: top;
+  height: 90%;
+  padding-left: 30px;
+  width: 80%;
 }
 
 .message-pane .header {
-  position:fixed;
-  top:0;
-  background:#fff;
-  width:100%;
-  z-index:2;
+  /*position: fixed;*/
+  /*top: 0;*/
+  /*background: #fff;*/
+  width: 100%;
+  z-index: 2;
+}
+
+.note-card-title {
+  display: inline-block;
+  cursor: text;
+  font-size: 20px;
+  color: #333;
 }
 
 .message-pane .header h1 {
-  padding:12px 0 10px 0;
-  margin-top:0px;
-  margin-bottom:0px;
-  font-size:24px;
-  color:#555459;
-  font-weight:900;
+  padding: 12px 0 10px 0;
+  margin-top: px;
+  margin-bottom: 0px;
+  margin-left: 30px;
+  color: #555459;
+  -webkit-align-self: flex-start;
+  -ms-flex-item-align: start;
+  align-self: flex-start;
+  height: 50px;
+  text-transform: uppercase;
+  font-size: 36px;
+  font-weight: 100;
+  color: #999;
+  line-height: 36px;
+  width: 80%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .message-pane .message-form {
-  position:fixed;
-  bottom:0;
-  padding:0 15px 15px 0;
-  background:#fff;
-  width:79%;
+  position: fixed;
+  bottom: 0;
+  padding: 0 15px 15px 0;
+  background: #fff;
 }
 
 .message-pane .message-wrap {
-  position:relative;
-  margin-top:15px;
+  position: relative;
+  margin-top: 15px;
 }
 
-.message-pane .message-wrap .user-pic {
-  width:36px;
-  height:36px;
-  border-radius:4px;
+.user-pic {
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
   display: inline-block;
   vertical-align: top;
 }
@@ -192,16 +230,139 @@ body {
 .message-pane .message-wrap .message-info {
   display: inline-block;
   vertical-align: top;
-  padding-left:5px;
+  padding-left: 5px;
 }
 
 .message-pane .message-wrap .message-info .user-name {
-  color:#555459;
-  font-weight:900;
+  color: #555459;
+  font-weight: 900;
 }
 
-.message-pane .message-wrap .message-info .user-name span{
-  color:#ccc;
+.message-pane .message-wrap .message-info .user-name span {
+  color: #ccc;
   font-weight: normal;
-  font-size:10px;
+  font-size: 10px;
 }
+
+.channel-panes {
+  height: 100%;
+}
+#wrapper {
+  height: 100%;
+}
+#center-wrapper {
+  height: 100%;
+}
+.chat-container {
+  /*float: left;*/
+  /*width: 20%;*/
+  /*overflow-y: scroll;*/
+
+  /*display: inline-block;*/
+  /*width: 19.5%;*/
+  /*vertical-align: top;*/
+  /*height: 100%;*/
+  /*background: #faf4f9;*/
+  /*position: relative;*/
+  /*overflow-y: scroll;*/
+  /*padding-bottom: 100px;*/
+}
+
+.pads-container {
+  /*width: 80%;*/
+  /*height: 100%;*/
+  /*overflow: scroll;*/
+}
+
+html, body {
+  height: 100%;
+  overflow: auto
+}
+
+.new-note-button {
+  position: fixed;
+  background: #f7ff2f;
+}
+
+.card {
+  /*-webkit-box-shadow: 0px 0px 11px 0px rgba(171, 171, 171, 1);*/
+  /*-moz-box-shadow: 0px 0px 11px 0px rgba(171, 171, 171, 1);*/
+  /*box-shadow: 0px 0px 11px 0px rgba(171, 171, 171, 1);*/
+  cursor: pointer;
+  border: 1px solid #ccc;
+  margin: 13px;
+  padding: 0 20px 20px 20px;
+}
+
+.small-text {
+  color: #999;
+  font-weight: normal;
+  font-size: 10px;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+#create-channel {
+
+  top: 15px;
+
+}
+
+
+#new-pad {
+  cursor: pointer;
+}
+
+.slack-icon {
+  content: url("../images/slack_black.png");
+  margin-top:10px;
+  margin-left: 5px;
+  width: 22px;
+  float: left;
+  height: 22px;
+}
+
+/*
+  Allow angular.js to be loaded in body, hiding cloaked elements until
+  templates compile.  The !important is important given that there may be
+  other selectors that are more specific or come later and might alter display.
+ */
+[ng\:cloak], [ng-cloak], .ng-cloak {
+  display: none !important;
+
+}
+
+.card-text {
+  color: #666;
+  font-weight: 200;
+  font-size: 14px;
+  padding: 0 15px;
+  overflow: hidden;
+  height: 250px;
+}
+
+.timestamp {
+  margin-bottom: 12px;
+  color: #CCCCCC;
+}
+
+#left {
+  float: left;
+  width: 70%;
+  height: 100%;
+  overflow: auto;
+}
+
+#right {
+  float: left;
+  width: 20%;
+  height: 100%;
+  overflow: auto;
+}
+
+.create-channel-form {
+  left: 20px;
+}
+

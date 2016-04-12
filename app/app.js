@@ -20,10 +20,10 @@ angular
         url: '/',
         templateUrl: 'home/home.html',
         resolve: {
-          requireNoAuth: function($state, Auth){
-            return Auth.$requireAuth().then(function(auth){
+          requireNoAuth: function ($state, Auth) {
+            return Auth.$requireAuth().then(function (auth) {
               $state.go('channels');
-            }, function(error){
+            }, function (error) {
               return;
             });
           }
@@ -34,10 +34,10 @@ angular
         controller: 'AuthCtrl as authCtrl',
         templateUrl: 'auth/login.html',
         resolve: {
-          requireNoAuth: function($state, Auth){
-            return Auth.$requireAuth().then(function(auth){
+          requireNoAuth: function ($state, Auth) {
+            return Auth.$requireAuth().then(function (auth) {
               $state.go('home');
-            }, function(error){
+            }, function (error) {
               return;
             });
           }
@@ -46,32 +46,55 @@ angular
       .state('register', {
         url: '/register',
         controller: 'AuthCtrl as authCtrl',
+        params: { auth_type: 'default', auth_token: null},
         templateUrl: 'auth/register.html',
         resolve: {
-          requireNoAuth: function($state, Auth){
-            return Auth.$requireAuth().then(function(auth){
+          requireNoAuth: function ($state, Auth) {
+            return Auth.$requireAuth().then(function (auth) {
               $state.go('home');
-            }, function(error){
+            }, function (error) {
               return;
             });
           }
-        }
+        },
+
       })
       .state('profile', {
         url: '/profile',
         controller: 'ProfileCtrl as profileCtrl',
         templateUrl: 'users/profile.html',
         resolve: {
-          auth: function($state, Users, Auth){
-            return Auth.$requireAuth().catch(function(){
+          auth: function ($state, Users, Auth) {
+            return Auth.$requireAuth().catch(function () {
               $state.go('home');
             });
           },
-          profile: function(Users, Auth){
-            return Auth.$requireAuth().then(function(auth){
+          profile: function (Users, Auth) {
+            return Auth.$requireAuth().then(function (auth) {
               return Users.getProfile(auth.uid).$loaded();
             });
           }
+        }
+      })
+      .state('slack', {
+        url: '/slack',
+        controller: 'SlackCtrl as slackCtrl',
+        templateUrl: 'slack/callback.html',
+        resolve: {
+          //requireNoAuth: function ($state, Auth) {
+          //  return Auth.$requireAuth().then(function (auth) {
+          //   //$state.go('');
+          //    });
+          //  }, function (error) {
+          //    //$state.go('home');
+          //  });
+          //},
+
+          //profile: function (Users, Auth) {
+          //  return Auth.$requireAuth().then(function (auth) {
+          //    return Users.getProfile(auth.uid).$loaded();
+          //  });
+          //}
         }
       })
       .state('channels', {
@@ -79,53 +102,93 @@ angular
         controller: 'ChannelsCtrl as channelsCtrl',
         templateUrl: 'channels/index.html',
         resolve: {
-          channels: function (Channels){
-            return Channels.$loaded();
+          channels: function (AccessibleChannels) {
+            return AccessibleChannels.$loaded();
           },
-          profile: function ($state, Auth, Users){
-            return Auth.$requireAuth().then(function(auth){
-              return Users.getProfile(auth.uid).$loaded().then(function (profile){
-                if(profile.displayName){
+          profile: function ($state, Auth, Users) {
+            return Auth.$requireAuth().then(function (auth) {
+              return Users.getProfile(auth.uid).$loaded().then(function (profile) {
+                if (profile.displayName) {
                   return profile;
                 } else {
                   $state.go('profile');
                 }
               });
-            }, function(error){
+            }, function (error) {
               $state.go('home');
             });
           }
         }
       })
+
       .state('channels.create', {
         url: '/create',
         templateUrl: 'channels/create.html',
         controller: 'ChannelsCtrl as channelsCtrl'
       })
-      .state('channels.messages', {
-        url: '/{channelId}/messages',
-        templateUrl: 'channels/messages.html',
+
+      .state('channels.home', {
+        url: '/{channelId}',
+        templateUrl: 'channels/workspace.html',
         controller: 'MessagesCtrl as messagesCtrl',
         resolve: {
-          messages: function($stateParams, Messages){
+          messages: function ($stateParams, Messages) {
             return Messages.forChannel($stateParams.channelId).$loaded();
           },
-          channelName: function($stateParams, channels){
-            return '#'+channels.$getRecord($stateParams.channelId).name;
+          channelName: function ($stateParams, Channels) {
+            return '#' + Channels.$getRecord($stateParams.channelId).name;
+          },
+          channelId: function ($stateParams) {
+            return $stateParams.channelId;
+          },
+          notes: function ($stateParams, Notes) {
+            return Notes.forChannel($stateParams.channelId).$loaded();
           }
         }
       })
+
+      .state('channels.note', {
+        url: '/{channelId}/note/{noteId}',
+        templateUrl: 'note/note.html',
+        controller: 'NoteCtrl as noteCtrl',
+        resolve: {
+          messages: function ($stateParams, Messages) {
+            return Messages.forChannel($stateParams.channelId).$loaded();
+          },
+          channelName: function ($stateParams, Channels) {
+            return Channels.$getRecord($stateParams.channelId).name;
+          },
+          channelId: function ($stateParams) {
+            return $stateParams.channelId;
+          },
+          notes: function ($stateParams, Notes) {
+            return Notes.forChannel($stateParams.channelId).$loaded();
+          },
+          noteId: function ($stateParams) {
+            return $stateParams.noteId;
+          },
+          title: function ($stateParams, notes) {
+            var title = notes.$getRecord($stateParams.noteId).title;
+            if (!title) {
+              title = "New Note";
+
+            }
+            return title;
+          }
+        }
+      })
+
       .state('channels.direct', {
         url: '/{uid}/messages/direct',
-        templateUrl: 'channels/messages.html',
+        templateUrl: 'channels/workspace.html',
         controller: 'MessagesCtrl as messagesCtrl',
         resolve: {
-          messages: function($stateParams, Messages, profile){
+          messages: function ($stateParams, Messages, profile) {
             return Messages.forUsers($stateParams.uid, profile.$id).$loaded();
           },
-          channelName: function($stateParams, Users){
-            return Users.all.$loaded().then(function(){
-              return '@'+Users.getDisplayName($stateParams.uid);
+          channelName: function ($stateParams, Users) {
+            return Users.all.$loaded().then(function () {
+              return '@' + Users.getDisplayName($stateParams.uid);
             });
           }
         }
@@ -133,4 +196,4 @@ angular
 
     $urlRouterProvider.otherwise('/');
   })
-  .constant('FirebaseUrl', 'https://slack.firebaseio.com/');
+  .constant('FirebaseUrl', 'https://pingpad.firebaseio.com/');

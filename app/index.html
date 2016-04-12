@@ -2,7 +2,7 @@
 <html class="no-js">
   <head>
     <meta charset="utf-8">
-    <title>AngularFire Slack</title>
+    <title>Pingpad</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width">
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
@@ -34,6 +34,7 @@
        ga('send', 'pageview');
     </script>
 
+    <script src="https://npmcdn.com/masonry-layout@4.0/dist/masonry.pkgd.min.js"></script>
     <!-- build:js(.) scripts/vendor.js -->
     <!-- bower:js -->
     <script src="bower_components/jquery/dist/jquery.js"></script>
@@ -46,6 +47,20 @@
     <!-- endbower -->
     <!-- endbuild -->
 
+    <!-- CodeMirror -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.2.0/codemirror.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.2.0/codemirror.css"/>
+
+    <!-- Firepad -->
+    <link rel="stylesheet" href="styles/firepad.css" />
+    <script src="https://cdn.firebase.com/libs/firepad/1.2.0/firepad.min.js"></script>
+    <link href='https://fonts.googleapis.com/css?family=Lato:400,100,300,700' rel='stylesheet' type='text/css'>
+    <script src="firepad-userlist.js"></script>
+    <link rel="stylesheet" href="styles/firepad-userlist.css" />
+    <link rel="stylesheet" href="styles/google-now.css" />
+
+    <script src="./masonry.pkgd.min.js"></script>
+
     <!-- build:js({.tmp,app}) scripts/scripts.js -->
     <script src="app.js"></script>
     <script src="auth/auth.controller.js"></script>
@@ -55,7 +70,14 @@
     <script src="channels/channels.controller.js"></script>
     <script src="channels/channels.service.js"></script>
     <script src="channels/messages.service.js"></script>
-    <script src="channels/messages.controller.js"></script>
+
+    <script src="channels/accessible_channels.service.js"></script>
+    <script src="channels/workspace.controller.js"></script>
+    <script src="note/notes.service.js"></script>
+    <script src="note/note.controller.js"></script>
+    <script src="slack/slack.controller.js"></script>
+    <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
     <!-- endbuild -->
+
   </body>
 </html>

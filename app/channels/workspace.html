@@ -1,0 +1,91 @@
+<div class="header"  style="float:left" ng-init="messagesCtrl.init()">
+  <h1 class="ng-cloak" ng-bind="channelsCtrl.getDisplayName(messagesCtrl.channelId)"></h1>
+</div>
+<div class="actions" style="float:left" ng-click="messagesCtrl.createNote()">
+
+  <svg width="45px" height="45px" class="note-action-hex" viewBox="0 0 37 41" version="1.1"
+       xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+       xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <title>icon_pad_hexMenu</title>
+
+    <g id="Page-1" stroke="#ca3a6e" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+
+      <g id="assets" sketch:type="MSArtboardGroup" transform="translate(-87.000000, -164.000000)">
+
+        <g id="icon_pad_hexMenu" sketch:type="MSLayerGroup" transform="translate(88.000000, 165.000000)">
+
+          <path
+            d="M17.5034613,0.272804774 C18.1443022,0.272804774 18.7940437,0.431265385 19.3893928,0.764414501 L33.1150575,8.43734457 C34.2938883,9.09600614 34.9663756,10.2787332 35,11.5072803 L34.9980221,26.936189 C35,27.5585765 34.8368229,28.1895552 34.4926676,28.7680319 C34.1455455,29.3503269 33.6570032,29.8047079 33.0942895,30.1149471 L19.3666469,37.7955138 C18.7979995,38.1076621 18.1522138,38.2728048 17.4975276,38.2728048 C16.8586646,38.2728048 16.2099121,38.1152987 15.615552,37.7831042 L1.88593145,30.108265 C0.684354779,29.4362393 0.00890056794,28.2210564 0,26.9676902 L0.00197790399,11.5989201 C0.000988951993,10.9784418 0.164166031,10.3493723 0.507332373,9.77375936 C0.85346557,9.19432809 1.33805205,8.74090164 1.89779888,8.43066249 L15.6501653,0.743413697 C16.2148569,0.435083713 16.8547088,0.272804774 17.5034613,0.272804774 L17.5034613,0.272804774 L17.5034613,0.272804774 Z"
+            id="hex" fill="#fff" stroke="#ca3a6e" sketch:type="MSShapeGroup"></path>
+
+          <path
+            d="M18.738488,17.8910695 L26.2782069,17.8910695 C26.9509684,17.8910695 27.5028941,18.4056231 27.5028941,19.0338454 L27.5028941,19.0368901 C27.5028941,19.6651124 26.9509684,20.1786512 26.2782069,20.1786512 L18.738488,20.1786512 L18.738488,27.234227 C18.738488,27.8614344 18.1876509,28.3749732 17.515978,28.3749732 C16.8432165,28.3749732 16.2923794,27.8614344 16.2923794,27.234227 L16.2923794,20.1786512 L8.75374909,20.1786512 C8.07989896,20.1786512 7.52797325,19.6651124 7.52797325,19.0368901 L7.52797325,19.0338454 C7.52797325,18.4056231 8.07989896,17.8910695 8.75374909,17.8910695 L16.2923794,17.8910695 L16.2923794,10.8354936 C16.2923794,10.2082862 16.8432165,9.69576236 17.515978,9.69576236 C18.1876509,9.69576236 18.738488,10.2082862 18.738488,10.8354936 L18.738488,17.8910695 L18.738488,17.8910695 Z"
+            id="plusIcon" fill="#ca3a6e" sketch:type="MSShapeGroup"></path>
+
+        </g>
+      </g>
+    </g>
+  </svg>
+
+</div>
+<!--<button id="get-group-link" style="background-color:#ca3a6e">-->
+<!--&lt;!&ndash;Share group link&ndash;&gt;-->
+<!--</button>-->
+
+<div class="channel-panes">
+  <div id="wrapper">
+    <div id="center-wrapper">
+      <div id="left">
+
+        <div class="grid">
+          <div class="grid-item card"  ng-click="channelsCtrl.goToNote(messagesCtrl.channelId, note)" style="width: 300px; float:left" ng-repeat="note in messagesCtrl.notes">
+
+            <div >
+              <h1 class="note-card-title"> {{ note.title }}</h1>
+
+              <div class="note-card-text" style="  font-weight: 300;"
+                   ng-click="channelsCtrl.goToNote(messagesCtrl.channelId, note)">
+                <div class="timestamp" style=" color: #CCCCCC;">{{note.timestamp | date:'short' }}</div>
+                {{note.text}}
+              </div>
+            </div>
+
+
+          </div>
+        </div>
+        <!--<div class="new-note-button">-->
+        <!--<button ng-click="messagesCtrl.createNote()">New Note</button>-->
+        <!--</div>-->
+
+      </div>
+      <div id="right">
+        <div ng-repeat="message in messagesCtrl.messages">
+          <img class="user-pic" ng-src="{{ channelsCtrl.getGravatar(message.uid) }}"/>
+
+          <div class="message-info">
+            <div class="user-name">
+              {{ channelsCtrl.getDisplayName(message.uid) }}
+              <span class="timestamp">{{ message.timestamp | date:'short' }}</span>
+            </div>
+            <div class="message">
+              {{ message.body }}{{messagesCtrl.updateScroll()}}
+            </div>
+          </div>
+        </div>
+
+        <form class="message-form" ng-submit="messagesCtrl.sendMessage()">
+
+          <div class="input-group">
+            <input type="text" class="form-control" ng-model="messagesCtrl.message" placeholder="Type a message...">
+    <span class="input-group-btn">
+      <button class="btn btn-default" type="submit">Send</button>
+    </span>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+</div>

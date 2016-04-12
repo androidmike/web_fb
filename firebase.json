@@ -1,6 +1,6 @@
 {
   "firebase": "pingpad",
-  "public": ".",
+  "public": "app",
   "ignore": [
     "firebase.json",
     "**/.*",
