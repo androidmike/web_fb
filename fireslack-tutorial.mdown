@@ -1,0 +1,1371 @@
+# Introduction
+
+The goal of this tutorial is to guide you through the creation of a
+[Slack](https://slack.com/) clone called fireSlack. Upon completion, you will
+learn how to build a real time collaborative chat application using [angularFire](https://www.firebase.com/docs/web/libraries/angular/index.html)
+to integrate [Firebase](https://firebase.com) with [AngularJS](https://angularjs.org/).
+Your application will be able to provide the following features:
+
+- Sign up for an account
+- Join/create channels to chat in
+- Have a user profile
+- Direct message other users
+- See who's online
+
+## Prerequisites
+
+This course assumes knowledge of programming and at least basic knowledge of
+JavaScript and AngularJS. We recommend going through [A Better Way to Learn AngularJS](https://thinkster.io/a-better-way-to-learn-angularjs/)
+if you're not familiar with AngularJS. We've created a [seed repo](https://github.com/apai4/fireslack-seed)
+based off of the [Yeoman AngularJS Generator](https://github.com/yeoman/generator-angular)
+to help you get started faster. Before you begin, you will need to have [Node.js](https://nodejs.org/),
+[npm](https://www.npmjs.org/), and [Git](https://git-scm.com/) installed. We'll
+need Node.js and npm in order to install [Grunt](http://gruntjs.com/) and [Bower](http://bower.io/)
+for managing dependencies. Follow [these instructions](https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager)
+for installing Node.js and npm, and [these instructions](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+for installing Git. Additionally, you'll need to have a [free Firebase account](https://www.firebase.com/signup/?utm_medium=tutorial&utm_source=thinkster&campaign=angular_article)
+and create a Firebase for this tutorial.
+
+{x: install node}
+Install Node.js
+
+{x: install git}
+Install Git
+
+{x: clone seed repo}
+Clone the [seed repo](https://github.com/apai4/fireslack-seed)
+
+{x: create firebase}
+Create a new Firebase from the Firebase Dashboard
+
+## Final Notes About the Tutorial
+
+You should _never_ copy and paste code from this text unless we tell you to, as
+we've found that the skills being taught will stick better if you write out all
+of the code yourself. If you need more clarification on a certain part of the
+tutorial, we recommend that viewing the supplementary screencast series as we go
+into far more detail in each of the videos. It's also significantly easier to
+learn from the screencast series than the text, as you can actually see how a
+skilled developer manipulates the concepts in AngularJS to build a working
+application.
+
+# Getting Started
+
+Once the initial codebase is cloned locally, we'll need to run a few commands
+to install dependencies and get our application up and running. Within our
+codebase, run the following commands:
+
+{x: run npm install}
+Run `npm install` to install our node dependencies
+
+{x: install bower grunt}
+Run `npm install -g bower grunt-cli` to install Bower and Grunt.
+
+{x: run grunt serve}
+Run `grunt serve` to start our application.
+
+After running `grunt serve`, open up `http://localhost:4000` and you should see
+a splash page for our application, with a non-functional login and register
+page ready for us to build off of. In this tutorial, our directory structure
+will be grouped by feature (see #1 in [this list](https://www.airpair.com/angularjs/posts/top-10-mistakes-angularjs-developers-make))
+and we will be using [ui-router](https://github.com/angular-ui/ui-router) as
+our router. We'll also be using the "controller as" syntax for referencing our
+controllers.
+
+# Authenticating Users using angularFire
+
+Creating a registration and login system for your app can be tedious, but is
+often one of the most important and required features, and usually requires
+you to create your own backend. Thankfully, Firebase makes this really easy
+for us by providing us with a hosted solution.
+
+{x: enable auth auth}
+In the Login & Auth section of your Firebase, check the Enable Email & Password
+Authentication box.
+
+While you have your Firebase pulled up, keep your Firebase URL handy. It should
+look something like: `https://firebase-name-here.firebaseio.com/`
+
+{x: set firebaseurl}
+At the bottom of `app/app.js`, set the `FirebaseUrl` constant to your Firebase
+Url.
+
+```javascript
+  .constant('FirebaseUrl', 'https://firebase-name-here.firebaseio.com/');
+```
+
+## Creating the Auth Service
+
+{x: create new auth service}
+Let's create a new factory called `Auth` in `app/auth/auth.service.js`
+
+```javascript
+angular.module('angularfireSlackApp')
+  .factory('Auth', function(){
+
+  });
+```
+
+Here we'll inject `$firebaseAuth`, which is a service that AngularFire provides
+us with, along with our constant, `FirebaseUrl`. Then we'll be able to create a
+reference to Firebase using the `Firebase` constructor and our `FirebaseUrl`,
+which we'll be passing to the `$firebaseAuth` service. See the
+[angularFire API docs](https://www.firebase.com/docs/web/libraries/angular/api.html#angularfire-users-and-authentication)
+for a list of available methods `$firebaseAuth` provides. Our factory will
+return the `$firebaseAuth` service associated with our Firebase.
+
+{x: inject auth dependencies}
+Inject `$firebaseAuth` and `FirebaseUrl` into our `Auth` factory.
+
+{x: create firebase reference}
+Create a Firebase reference to our Firebase with `var ref = new Firebase(FirebaseUrl);`
+
+{x: create firebase auth}
+Pass the Firebase reference to the `$firebaseAuth` service, and have your
+factory return it.
+
+The resulting factory should look like this:
+
+```javascript
+angular.module('angularfireSlackApp')
+  .factory('Auth', function($firebaseAuth, FirebaseUrl){
+    var ref = new Firebase(FirebaseUrl);
+    var auth = $firebaseAuth(ref);
+
+    return auth;
+  });
+```
+
+Now that we have an `Auth` service ready for our application to use, let's
+create a controller to use with our login and registration forms.
+
+## Creating the Auth Controller
+
+{x: create authctrl}
+Create a controller named `AuthCtrl` and inject `Auth` and `$state` into it.
+
+```javascript
+angular.module('angularfireSlackApp')
+  .controller('AuthCtrl', function(Auth, $state){
+    var authCtrl = this;
+
+  });
+```
+
+The `$state` service is provided by `ui-router` for us to control the state
+of our application. We can use the `go()` function on `$state` to redirect
+our application to a specific state. We also create a reference to the `this`
+keyword within our controller because we're using the `controller as` syntax.
+For more information about this syntax, see [this lesson](https://thinkster.io/a-better-way-to-learn-angularjs/controllers).
+
+
+{x: initialize user}
+Next, create a user object on our controller with empty strings for email and
+password
+
+```javascript
+angular.module('angularfireSlackApp')
+  .controller('AuthCtrl', function(Auth, $state){
+    var authCtrl = this;
+
+    authCtrl.user = {
+      email: '',
+      password: ''
+    };
+  });
+```
+
+This user object will be used with the `ng-model` directive in our form. Next,
+we'll need two functions on our controller, one for registering users and one
+for logging in users. `$firebaseAuth` provides us with two functions:
+`$authWithPassword` for logging in users and `$createUser` for registering
+users. Both of these functions take a user object like the one we initialized
+on our controller, and return a promise. If you're not familiar with how
+promises work, read [this](https://thinkster.io/a-better-way-to-learn-angularjs/promises)
+to learn more about promises.
+
+{x: create authctrl login}
+Create the following `login` function in `AuthCtrl`:
+
+```javascript
+authCtrl.login = function (){
+  Auth.$authWithPassword(authCtrl.user).then(function (auth){
+    $state.go('home');
+  }, function (error){
+    authCtrl.error = error;
+  });
+};
+```
+
+When authentication is successful, we want to send the user to the home state.
+When it fails, we want to set the error on our controller so we can display the
+error message to our user.
+
+{x: create authctrl register}
+Create the following `register` function in `AuthCtrl`
+
+```javascript
+authCtrl.register = function (){
+  Auth.$createUser(authCtrl.user).then(function (user){
+    authCtrl.login();
+  }, function (error){
+    authCtrl.error = error;
+  });
+};
+```
+
+Our `register` function works very similarly to our `login` function. We want
+to set `error` on the controller if `$createUser` fails, however, when
+`$createUser` succeeds, it doesn't automatically log in the user that was just
+created so we'll need to call the `login` function we just created to log the
+user in. Now that we have our authentication service and controller created,
+let's update our templates and put them to use.
+
+{x: include auth service controller}
+In `app/index.html`, include the auth service and controller after where
+`app.js` is included.
+
+```html
+<script src="app.js"></script>
+<script src="auth/auth.controller.js"></script>
+<script src="auth/auth.service.js"></script>
+```
+
+{x: specify login register controller}
+In `app/app.js`, specify `AuthCtrl` as our controller for both the `login` and
+`register` states.
+
+```javascript
+.state('login', {
+  url: '/login',
+  controller: 'AuthCtrl as authCtrl',
+  templateUrl: 'auth/login.html'
+})
+.state('register', {
+  url: '/register',
+  controller: 'AuthCtrl as authCtrl',
+  templateUrl: 'auth/register.html'
+})
+```
+
+{x: register ngsubmit}
+In `app/auth/register.html`, add `ng-submit` to the form and specify
+`authCtrl.register()` as the submit function.
+
+{x: register ngmodel email}
+Add `ng-model="authCtrl.user.email"` to the email input.
+
+{x: register ngmodel password}
+Add `ng-model="authCtrl.user.password"` to the password input.
+
+The resulting form should look like this:
+
+```html
+<form ng-submit="authCtrl.register()">
+  <div class="input-group">
+    <input type="email" class="form-control" placeholder="Email" ng-model="authCtrl.user.email">
+  </div>
+  <div class="input-group">
+    <input type="password" class="form-control" placeholder="Password" ng-model="authCtrl.user.password">
+  </div>
+  <input type="submit" class="btn btn-default" value="Register">
+</form>
+```
+
+{x: register error div}
+Finally, add the following `div` just above the form:
+
+```html
+<div ng-show="authCtrl.error">
+  <span>{{ authCtrl.error.message }}</span>
+</div>
+```
+
+This div will remain hidden until our authentication controller reaches an
+error, in which case the error message it will get displayed to our user. Next,
+let's update our login template in a similar fashion.
+
+{x: login ngsubmit}
+In `app/auth/login.html`, add `ng-submit="authCtrl.login()"` to the form.
+
+{x: login ngmodel email}
+Add `ng-model="authCtrl.user.email"` to the email input.
+
+{x: login ngmodel password}
+Add `ng-model="authCtrl.user.password"` to the password input.
+
+```html
+<form ng-submit="authCtrl.login()">
+  <div class="input-group">
+    <input type="email" class="form-control" placeholder="Email" ng-model="authCtrl.user.email">
+  </div>
+  <div class="input-group">
+    <input type="password" class="form-control" placeholder="Password" ng-model="authCtrl.user.password">
+  </div>
+  <input type="submit" class="btn btn-default" value="Log In">
+</form>
+```
+
+{x: login error div}
+Finally, add the same `div` that we did for the register view just above the
+form for error handling:
+
+```html
+<div ng-show="authCtrl.error">
+  <span>{{ authCtrl.error.message }}</span>
+</div>
+```
+
+Now we should have a working register and login system, but we have no way of
+telling if the user is logged in or not. The login and registration pages are
+still accessible if we are authenticated. We can resolve this by using the
+`resolve` property on our states. `resolve` allows us to create dependencies
+that can be injected into controllers or child states. These dependencies can
+depend on services in our app that return promises, and the promises will get
+resolved before our controller gets instantiated.  Read the [ui-router Github Wiki](https://github.com/angular-ui/ui-router/wiki#resolve)
+if you're not familiar with how `resolve` works with `ui-router`.
+
+{x: login register resolve}
+Add the following resolve property to both the `login` and `register` state:
+
+```javascript
+resolve: {
+  requireNoAuth: function($state, Auth){
+    return Auth.$requireAuth().then(function(auth){
+      $state.go('home');
+    }, function(error){
+      return;
+    });
+  }
+}
+```
+
+The `$firebaseAuth` service provides us with a `$requireAuth` function which
+returns a promise. This promise will get resolved with an `auth` object if the
+user is logged in. The [Firebase Documentation](https://www.firebase.com/docs/web/guide/login/password.html#section-logging-in)
+provides a table of what information is available to us within `auth`. If the
+user is not authenticated, the promise gets rejected. In our `requireNoAuth`
+dependency, if the User is logged in we want to send them back to the `home`
+state, otherwise, we need to catch the error that gets thrown and handle it
+gracefully by returning nothing, allowing the promise to be resolved instead
+of rejected. Now, we should no longer be able to access the login or register
+states if we're authenticated.
+
+# Storing User Profiles in Firebase
+
+Now that we're able to authenticate users, let's create the ability for users
+to have custom display names to use in our app (rather than showing the user's
+email or uid)
+
+{x: Create users service}
+Create a factory `Users` in `app/users/users.service.js`. This factory will
+depend on `$firebaseArray`, `$firebaseObject`, and `FirebaseUrl;
+
+```javascript
+angular.module('angularfireSlackApp')
+  .factory('Users', function($firebaseArray, $firebaseObject, FirebaseUrl){
+
+    var Users = {};
+
+    return Users;
+  });
+```
+
+The purpose of this factory is to provide us with the ability to get either
+a specific user's data, or to get a list of all of our users. Note that while
+Firebase provides us with a means of authentication, all of the authentication
+data is separate from our Firebase data and can't be queried. It is up to us to
+store any custom user data within Firebase manually.
+
+{x: create users ref}
+Create a reference to the `users` node
+
+```javascript
+angular.module('angularfireSlackApp')
+  .factory('Users', function($firebaseArray, $firebaseObject, FirebaseUrl){
+    var usersRef = new Firebase(FirebaseUrl+'users');
+
+    var Users = {};
+
+    return Users;
+  });
+```
+
+Data in Firebase is stored in a [tree structure](https://en.wikipedia.org/wiki/Tree_%28data_structure%29)
+and child nodes can be referenced by adding a path to our `FirebaseUrl`,
+so `https://firebase-name-here.firebase.io.com/users` refers to the `users`
+node.
+
+{x: read firebase data}
+Read the Firebase documentation on [understanding data](https://www.firebase.com/docs/web/guide/understanding-data.html)
+to learn about how data is stored in Firebase, along with the limitations and
+restrictions.
+
+{x: create users array}
+Create a `$firebaseArray` using the reference we just created.
+
+```javascript
+angular.module('angularfireSlackApp')
+  .factory('Users', function($firebaseArray, $firebaseObject, FirebaseUrl){
+    var usersRef = new Firebase(FirebaseUrl+'users');
+    var users = $firebaseArray(usersRef);
+
+    var Users = {};
+
+    return Users;
+  });
+```
+
+It's also good to know that while `$firebaseArray` will return pseudo array,
+meaning it will act a lot like an array in javascript, however, methods like
+`splice()`, `push()`, `pop()` will only affect data locally and not on the
+Firebase. Instead, `$firebaseArray` provides methods named `$add` and `$remove`
+to provide similar functionality while keeping your data in sync. Read the
+[$firebaseArray Documentation](https://www.firebase.com/docs/web/libraries/angular/api.html#angularfire-firebasearray)
+For a complete understanding of how `$firebaseArray` should be used.
+
+{x: create Users object}
+Set `Users` to the following object:
+
+```javascript
+var Users = {
+  getProfile: function(uid){
+    return $firebaseObject(usersRef.child(uid));
+  },
+  getDisplayName: function(uid){
+    return users.$getRecord(uid).displayName;
+  },
+  all: users
+};
+```
+
+`getProfile(uid)` allows us to get a `$firebaseObject` of a specific user's
+profile, while `all` returns a `$firebaseArray` of all the users.
+`getDisplayName(uid)` is a helper function that returns a user's `displayName`
+when given a `uid`. We will be keying our data by the `uid` that comes back from our Firebase auth data, so data in our Firebase will look similar to:
+
+```javascript
+{
+  "users": {
+    "simplelogin:1":{
+      "displayName": "Blake Jackson"
+    }
+  }
+}
+```
+
+Now that our `Users` service is created, let's create a controller for updating
+a user's profile. First we'll need to create a new state in `app/app.js` to
+`resolve` a couple dependencies. We want to have the user's `auth` data
+and their profile available to us before our controller is instantiated.
+
+{x: create profile state}
+Create a new state for profile:
+
+```javascript
+.state('profile', {
+  url: '/profile',
+  resolve: {
+    auth: function($state, Users, Auth){
+      return Auth.$requireAuth().catch(function(){
+        $state.go('home');
+      });
+    },
+    profile: function(Users, Auth){
+      return Auth.$requireAuth().then(function(auth){
+        return Users.getProfile(auth.uid).$loaded();
+      });
+    }
+  }
+})
+```
+
+We left the `controller` and `templateUrl` properties out of the state
+configuration temporarily because we haven't created them yet. The `auth`
+dependency is similar to the `requireNoAuth` dependency we created for
+`login` and `register`, except it does the inverse, where the user is
+redirected to the `home` state if they're not authenticated. The `.catch`
+function is a shorthand for handling promises if we don't want to provide
+a success handler. The `profile` dependency also ensures authentication,
+but resolves to the user's profile using the `getProfile` function we
+created in our `Users` service. `$loaded` is a function provided by
+both `$firebaseObject` and `$firebaseArray` that returns a promise that
+gets resolved when the data from Firebase is available locally.
+
+{x: create profile controller}
+Create `ProfileCtrl` in `app/users/profile.controller.js`, injecting `$state`,
+`md5`, `auth`, and `profile`
+
+```javascript
+angular.module('angularfireSlackApp')
+  .controller('ProfileCtrl', function($state, md5, auth, profile){
+    var profileCtrl = this;
+  });
+```
+
+We'll be using [Gravatar](https://en.gravatar.com/) to get profile picture
+functionality in our application. Gravatar is a service that provides us with a
+user's profile picture when given an email, however the email needs to be
+[md5 hashed](https://en.wikipedia.org/wiki/MD5). Luckily, there are many
+modules available that can do this for us, and [angular-md5](https://github.com/gdi2290/angular-md5)
+was already included in our seed codebase.
+
+{x: set profilectrl profile}
+Set `profile` on the controller to the one that was resolved by the router
+
+```javascript
+profileCtrl.profile = profile;
+```
+
+{x: create updateprofile}
+Create the following `updateProfile` function on our controller:
+
+```javascript
+profileCtrl.updateProfile = function(){
+  profileCtrl.profile.emailHash = md5.createHash(auth.password.email);
+  profileCtrl.profile.$save();
+};
+```
+
+Here we're getting the current user's email from the `auth` data that was
+resolved from our router, hashing it and setting to `emailHash` on `profile`.
+`displayName` will be set from the template we'll be creating next using
+`ng-model`.
+
+{x: create}
+Add a helper function `getGravatar` to the `Users` service that will return the
+url to a user's gravatar image when provided a `uid`.
+
+```javascript
+getGravatar: function(uid){
+  return '//www.gravatar.com/avatar/' + users.$getRecord(uid).emailHash;
+},
+```
+
+{x: include user service profile contoller}
+In `app/index.html`, include the user service and profile controller
+
+```html
+<script src="auth/auth.service.js"></script>
+<script src="users/users.service.js"></script>
+<script src="users/profile.controller.js"></script>
+```
+
+{x: set profile state template controller}
+Set `controller` and `templateUrl` in the `profile` state to the following:
+
+```javascript
+url: '/profile',
+controller: 'ProfileCtrl as profileCtrl',
+templateUrl: 'users/profile.html',
+```
+
+{x: create profile html}
+Create the edit profile template in `users/profile.html` with the following code:
+
+```html
+<div class="page-wrapper">
+
+  <div class="page-header">
+    <h1>Edit Profile</h1>
+  </div>
+
+  <form ng-submit="profileCtrl.updateProfile()">
+    <p ng-hide="profileCtrl.profile.displayName">
+      You'll need a display name before you can start chatting.
+    </p>
+
+    <div class="input-group">
+      <input required type="text" class="form-control" placeholder="Display Name" ng-model="profileCtrl.profile.displayName">
+    </div>
+    <input type="submit" class="btn btn-default" value="Set Display Name">
+  </form>
+
+</div>
+```
+
+We should now be able to navigate to `http://localhost:4000/#/profile`, specify
+a display name for our user, submit the form and it should persist when we
+refresh the page.
+
+# Creating the Channels Sidebar
+
+Now that our Users can authenticate and have profiles, we can finally start to
+create the functionality for Channels. We're going to start by creating the
+left sidebar for listing channels and display the current user's profile.
+
+{x: create channels service}
+Create a service `Channels` in `app/channels/channels.service.js` that will
+return a `$firebaseArray` at the `channels` node.
+
+```javascript
+angular.module('angularfireSlackApp')
+  .factory('Channels', function($firebaseArray, FirebaseUrl){
+    var ref = new Firebase(FirebaseUrl+'channels');
+    var channels = $firebaseArray(ref);
+
+    return channels;
+  });
+```
+
+{x: create channels state}
+Create a state for `channels` with the following code:
+
+```javascript
+.state('channels', {
+  url: '/channels',
+  resolve: {
+    channels: function (Channels){
+      return Channels.$loaded();
+    },
+    profile: function ($state, Auth, Users){
+      return Auth.$requireAuth().then(function(auth){
+        return Users.getProfile(auth.uid).$loaded().then(function (profile){
+          if(profile.displayName){
+            return profile;
+          } else {
+            $state.go('profile');
+          }
+        });
+      }, function(error){
+        $state.go('home');
+      });
+    }
+  }
+})
+```
+
+`templateUrl` and `controller` are temporarily omitted since we haven't created
+them yet. We're resolving two dependencies here: `channels`, which is promising
+our `$firebaseArray` of channels, and `profile`, which is a lot like the
+`profile` dependency in the `profile` state, but we're ensuring that the user
+already a displayName set, otherwise they're taken to the `profile` state, and
+if they're not authenticated, they get sent to the `home` state.
+
+{x: create channels controller}
+Create `ChannelsCtrl` in `app/channels/channels.controller.js`, injecting
+`$state`, `Auth`, `profile`, and `channels`.
+
+```javascript
+angular.module('angularfireSlackApp')
+  .controller('ChannelsCtrl', function($state, Auth, Users, profile, channels){
+    var channelsCtrl = this;
+  });
+```
+
+{x: set channelsctrl profile channel}
+Set `channels` and `profile` to the resolved dependencies from the router
+
+```javascript
+channelsCtrl.profile = profile;
+channelsCtrl.channels = channels;
+```
+
+{x: set channelsctrl helper functions}
+Set `getDisplayName` and `getGravatar` to the respective functions on the
+`Users` service.
+
+```javascript
+channelsCtrl.getDisplayName = Users.getDisplayName;
+channelsCtrl.getGravatar = Users.getGravatar;
+```
+
+{x: create logout function}
+Create a `logout` function that will allow our users to log out, returning them
+to the `home` state.
+
+```javascript
+channelsCtrl.logout = function(){
+  Auth.$unauth();
+  $state.go('home');
+};
+```
+
+{x: include rooms service controller}
+In `app/index.html`, include the channels service and controller
+
+```html
+<script src="users/profile.controller.js"></script>
+<script src="channels/channels.controller.js"></script>
+<script src="channels/channels.service.js"></script>
+```
+
+{x: sidebar markup}
+Create the template for our channels sidebar in `app/channels/index.html` with
+the following code:
+
+```html
+<div class="main">
+  <div class="sidebar">
+
+    <div class="slack-name">
+      <h2>FireSlack</h2>
+    </div>
+
+    <div class="channel-list">
+      <div class="list-head">Channels</div>
+    </div>
+
+    <div class="my-info">
+      <img class="user-pic" ng-src="{{ channelsCtrl.getGravatar(channelsCtrl.profile.$id) }}" />
+      <div class="user-info">
+        <div class="user-name">
+          {{ channelsCtrl.profile.displayName }}
+        </div>
+
+        <div class="options">
+          <a ui-sref="profile">edit profile</a>
+          /
+          <a href="#" ng-click="channelsCtrl.logout()">logout</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+```
+
+{x: update channels state}
+Set the `controller` and `templateUrl` in `channels` state to the following:
+
+```javascript
+url: '/channels',
+controller: 'ChannelsCtrl as channelsCtrl',
+templateUrl: 'channels/index.html',
+```
+
+{x: home state requrienoauth}
+Add the following `resolve` to the `home` state:
+
+```javascript
+resolve: {
+  requireNoAuth: function($state, Auth){
+    return Auth.$requireAuth().then(function(auth){
+      $state.go('channels');
+    }, function(error){
+      return;
+    });
+  }
+}
+```
+
+{x: updateprofile go channels}
+Update the `updateProfile` function in `ProfileCtrl` to send the user to the
+`channels` state after a successful save.
+
+```javascript
+profileCtrl.updateProfile = function(){
+  profileCtrl.profile.emailHash = md5.createHash(auth.password.email);
+  profileCtrl.profile.$save().then(function(){
+    $state.go('channels');
+  });
+};
+```
+
+This `requireNoAuth` dependency is a lot like the one on `login` and `register`
+but it sends the user to the `channels` state. If you want, you can change the
+`requireNoAuth` dependency on `login` and `register` to also send the user to
+the `channels` state as well. Now when we're logged in and visit
+`http://localhost:4000` we should be sent to the `channels` state. In that
+state, we can see the sidebar we just created for our application. There should
+be the logged in user's name and Gravatar at the bottom of the sidebar, and an
+edit profile and logout link next to it. We're using the `ui-sref` directive
+that comes with `ui-router` to specify what state we should navigate to on
+click. If we click on edit profile, we can update the user's `displayName` and
+it should send us back to the `channels` state when we submit the form. The
+logout link should log us out and send us back to the `home` state. Now let's
+create the view to create channels.
+
+{x: create channels create state}
+Create a new state `channels.create`:
+
+```javascript
+.state('channels.create', {
+  url: '/create',
+  templateUrl: 'channels/create.html',
+  controller: 'ChannelsCtrl as channelsCtrl'
+})
+```
+
+This state is a child state of the `channels` controller (the dot notation in
+the state name specifies `parentState.childState`). This state will also use
+`ChannelsCtrl`. We'll want to render our child states to the right of the
+sidebar. We need to declare another `ui-view` tag in order for our child
+states to appear. You can read more about `ui-router`'s nested states at this
+[Github Wiki](https://github.com/angular-ui/ui-router/wiki/Nested-States-and-Nested-Views).
+
+{x: add ui view}
+Add the `message-pane` div with a `ui-view` tag in `app/channels/index.html`.
+This should be at the end of the `main` div after the `sidebar` div.
+
+```html
+<div class="message-pane">
+  <ui-view></ui-view>
+</div>
+```
+
+{x: create channelsctrl newchannel}
+Add a `newChannel` object on `ChannelsCtrl` with a blank name
+
+```javascript
+channelsCtrl.newChannel = {
+  name: ''
+};
+```
+
+{x: create channelsctrl createchannel}
+Create a `createChannel` function on `ChannelsCtrl`.
+
+```javascript
+channelsCtrl.createChannel = function(){
+  channelsCtrl.channels.$add(channelsCtrl.newChannel).then(function(){
+    channelsCtrl.newChannel = {
+      name: ''
+    };
+  });
+};
+```
+
+The `$add` function on the channels `$firebaseArray` provides similar
+functionality to the `.push()` function on a Javascript `Array`, but keeps our
+data in sync with Firebase, while returning a promise. Once the new channel is
+created we'll need to clear out the `newChannel` object.
+
+{x: create createchannel html}
+Create the a form in `app/channels/create.html` for creating a new channel
+
+```html
+<div class="header">
+  <h1>Create a channel</h1>
+</div>
+
+<form ng-submit="channelsCtrl.createChannel()">
+  <div class="input-group">
+    <input type="text" class="form-control" placeholder="Channel Name" ng-model="channelsCtrl.newChannel.name">
+  </div>
+  <input type="submit" class="btn btn-default" value="Create Channel">
+</form>
+```
+
+{x: channel list markup}
+Create the channels listing in `app/channels/index.html` using the following
+markup in the `channel-list` div below the `list-head` div:
+
+```html
+<div class="channel-list">
+  <div class="list-head">Channels</div>
+  <div class="channel" ng-repeat="channel in channelsCtrl.channels">
+    <a># {{ channel.name }}</a>
+  </div>
+</div>
+```
+
+We're using the `ng-repeat` directive to iterate over our array of `channels`.
+
+{x: channel create link}
+Create a link to the `channels.create` state below the channel listing:
+
+```html
+<div class="channel-list">
+  <div class="list-head">Channels</div>
+  <div class="channel" ng-repeat="channel in channelsCtrl.channels">
+    <a># {{ channel.name }}</a>
+  </div>
+
+  <div class="channel create">
+    <a ui-sref="channels.create">+ create channel</a>
+  </div>
+</div>
+```
+
+We're now able to click on the create channel link and start creating
+channels!
+
+
+# Adding Messaging Functionality
+
+{x: create messages service}
+Create a service for retrieving messages
+
+```javascript
+angular.module('angularfireSlackApp')
+  .factory('Messages', function($firebaseArray, FirebaseUrl){
+    var channelMessagesRef = new Firebase(FirebaseUrl+'channelMessages');
+
+    return {
+      forChannel: function(channelId){
+        return $firebaseArray(channelMessagesRef.child(channelId));
+      }
+    };
+  });
+```
+
+The `forChannel` function on our service returns a `$firebaseArray` of messages
+when provided a `channelId`. Later in this tutorial, we'll create a `forUsers`
+function for retrieving direct messages.
+
+{x: create messages state}
+Create a new state `channels.messages` with the following code:
+
+```javascript
+.state('channels.messages', {
+  url: '/{channelId}/messages',
+  resolve: {
+    messages: function($stateParams, Messages){
+      return Messages.forChannel($stateParams.channelId).$loaded();
+    },
+    channelName: function($stateParams, channels){
+      return '#'+channels.$getRecord($stateParams.channelId).name;
+    }
+  }
+})
+```
+
+This state will again be a child state of `channels`. Our url will have a
+`channelId` parameter. We can access this parameter with `$stateParams`,
+provided by `ui-router`. We're resolving `messages`, which is using the
+`forChannel` function from our `Messages` service, and `channelName`
+which we'll be using to display the channel's name in our messages pane.
+Channel names will be prefixed with a `#`. The `channels` dependency we're
+injecting is coming from the parent state `channels` since child states
+inherit their parent's dependencies. We'll come back and add the `controller`
+and `templateUrl` properties once we create our controller and template.
+
+{x: create messagesctrl}
+Create a new controller `MessagesCtrl` in `app/channels/messages.controller.js`.
+We'll be injecting `profile`, `channelName`, and `messages`
+
+```javascript
+angular.module('angularfireSlackApp')
+  .controller('MessagesCtrl', function(profile, channelName, messages){
+    var messagesCtrl = this;
+  });
+```
+
+Again, the `profile` dependency that we're injecting will actually come from
+the parent state `channels` that resolves to the current user's profile.
+
+{x: set messages channelname}
+Set `messages` and `channelName` on `messagesCtrl` to the respective
+dependencies
+
+```javascript
+messagesCtrl.messages = messages;
+messagesCtrl.channelName = channelName;
+```
+
+{x: set messagesctrl messages}
+Set `message` on `messagesCtrl` to an empty string.
+
+```javascript
+messagesCtrl.message = '';
+```
+
+{x: create sendmessage}
+Create a function `sendMessage` to `$add` a message to `messages`.
+
+```javascript
+messagesCtrl.sendMessage = function (){
+  if(messagesCtrl.message.length > 0){
+    messagesCtrl.messages.$add({
+      uid: profile.$id,
+      body: messagesCtrl.message,
+      timestamp: Firebase.ServerValue.TIMESTAMP
+    }).then(function (){
+      messagesCtrl.message = '';
+    });
+  }
+};
+```
+
+A message object will need to contain `uid`, which will be how we identify
+who sent the message. `body` contains the message our user input, and
+`timestamp` is a constant from `Firebase` that tells the Firebase servers
+to use the their clock for the timestamp. When a message sends successfully,
+we'll want to clear out `messagesCtrl.message` so the user can type a new
+message.
+
+{x: include messages service controller}
+In `app/index.html`, include our messages service and controller.
+
+```html
+<script src="channels/channels.service.js"></script>
+<script src="channels/messages.service.js"></script>
+<script src="channels/messages.controller.js"></script>
+```
+
+{x: create messages markup}
+Create the following template in `app/channels/messages.html`:
+
+```html
+<div class="header">
+  <h1>{{ messagesCtrl.channelName }}</h1>
+</div>
+
+<div class="message-wrap" ng-repeat="message in messagesCtrl.messages">
+  <img class="user-pic" ng-src="{{ channelsCtrl.getGravatar(message.uid) }}" />
+  <div class="message-info">
+    <div class="user-name">
+      {{ channelsCtrl.getDisplayName(message.uid) }}
+      <span class="timestamp">{{ message.timestamp | date:'short' }}</span>
+    </div>
+    <div class="message">
+     {{ message.body }}
+    </div>
+  </div>
+</div>
+
+<form class="message-form" ng-submit="messagesCtrl.sendMessage()">
+
+  <div class="input-group">
+    <input type="text" class="form-control" ng-model="messagesCtrl.message" placeholder="Type a message...">
+    <span class="input-group-btn">
+      <button class="btn btn-default" type="submit">Send</button>
+    </span>
+  </div>
+  
+</form>
+```
+
+Here we're creating a header to display the `channelName` from our controller.
+Then we're `ng-repeat`ing over `messages` and using `message.uid` and the
+helper functions from `channelsCtrl` to get the user's display name and
+Gravatar. We're also using Angular's `date` filter on the timestamp to display
+a short timestamp. Finally, at the bottom of our view we have the form for
+sending messages which submits to the `sendMessage` function from our
+controller.
+
+{x: update messages state}
+Update the `channels.messages` state to use the template and controller we
+just created.
+
+```javascript
+url: '/{channelId}/messages',
+templateUrl: 'channels/messages.html',
+controller: 'MessagesCtrl as messagesCtrl',
+```
+
+{x: add channels links}
+Update the channel links in the sidebar so we can navigate to channels.
+
+```html
+<a ui-sref="channels.messages({channelId: channel.$id})" ui-sref-active="selected"># {{ channel.name }}</a>
+```
+
+We're specifying the parameters for the `channels.messages` state within the
+`ui-sref` directive. The `ui-sref-active` directive will add the specified
+class (`selected` in our case) to the element when a state specified in a
+sibling or child `ui-sref` directive. Now we should be able to navigate between
+channels and start chatting!
+
+{x: update createchannel}
+Update the `createChannel` function to send the user to the newly created
+channel upon creation.
+
+```javascript
+channelsCtrl.createChannel = function(){
+  channelsCtrl.channels.$add(channelsCtrl.newChannel).then(function(ref){
+    $state.go('channels.messages', {channelId: ref.key()});
+  });
+};
+```
+
+# Creating Direct Messages
+
+Now that we have working channels with messaging, adding direct messages will
+be easier since we can reuse a lot of the existing functionality we have.
+
+{x: add usermessages ref}
+In our `Messages` service, add a Firebase reference to the `userMessages` node.
+
+```javascript
+    var userMessagesRef = new Firebase(FirebaseUrl+'userMessages')
+```
+
+{x: add messages forusers}
+Add a `forUsers` function to our `Messages` service to retrieve direct messages
+between two users, given their uids.
+
+```javascript
+return {
+  forChannel: function(channelId){
+    return $firebaseArray(channelMessagesRef.child(channelId));
+  },
+  forUsers: function(uid1, uid2){
+    var path = uid1 < uid2 ? uid1+'/'+uid2 : uid2+'/'+uid1;
+
+    return $firebaseArray(userMessagesRef.child(path));
+  }
+};
+```
+
+We'll be storing our direct messages in Firebase like so:
+
+```javascript
+{
+  "userMessages": {
+    "simplelogin:1": {
+      "simplelogin:2": {
+        "messageId1": {
+          "uid": "simplelogin:1",
+          "body": "Hello!",
+          "timestamp": Firebase.ServerValue.TIMESTAMP
+        },
+        "messageId2": {
+          "uid": "simplelogin:2",
+          "body": "Hey!",
+          "timestamp": Firebase.ServerValue.TIMESTAMP
+        }
+      }
+    }
+  }
+}
+```
+
+Since we always want to reference the same path in our Firebase regardless of
+which id was passed first, we'll need to sort our ids before referencing the
+direct messages.
+
+{x: create channels direct state}
+Create a new state `channels.direct` with the following code:
+
+```javascript
+.state('channels.direct', {
+  url: '/{uid}/messages/direct',
+  templateUrl: 'channels/messages.html',
+  controller: 'MessagesCtrl as messagesCtrl',
+  resolve: {
+    messages: function($stateParams, Messages, profile){
+      return Messages.forUsers($stateParams.uid, profile.$id).$loaded();
+    },
+    channelName: function($stateParams, Users){
+      return Users.all.$loaded().then(function(){
+        return '@'+Users.getDisplayName($stateParams.uid);
+      });
+    }
+  }
+});
+```
+
+This state is almost identical to `channels.messages`, using the same
+`templateUrl` and `controller`. We're using a different `url`, and the
+`messages` dependency is using the `Messages.forUsers` function that we just
+created. The `channelName` dependency also looks up the other user's display
+name, and prefixes it with `@`.
+
+{x: inject users channels}
+Inject the `Users` service into `ChannelsCtrl`
+
+{x: set users channelsctrl}
+Set `users` on `channelsCtrl` to `Users.all`
+
+```javascript
+channelsCtrl.users = Users.all;
+```
+
+{x: add direct messages sidebar}
+Update the sidebar to have to list all users and link to their conversations.
+
+```html
+<div class="channel create">
+  <a ui-sref="channels.create">+ create channel</a>
+</div>
+
+<div class="list-head">Direct Messages</div>
+<div class="channel" ng-repeat="user in channelsCtrl.users">
+  <a ng-if="user.$id !== channelsCtrl.profile.$id" ui-sref="channels.private({uid: user.$id})" ui-sref-active="selected">
+    {{ user.displayName }}
+  </a>
+</div>
+```
+
+We're now able to chat directly to other users in our application!
+
+# Adding Presence to Users
+
+Having direct messaging is an important feature to any chat application, but
+it's also very useful to know what users are online. Firebase makes this very
+easy for us. Read the [Firebase Documentation](https://www.firebase.com/docs/web/guide/offline-capabilities.html#section-sample)
+to see some example code using presence. While this code is written using the
+core Firebase library, we're going to replicate the same functionality using
+AngularFire.
+
+{x: add users connectedref}
+Add a reference to the special `.info/connected` node on your Firebase
+
+```javascript
+var usersRef = new Firebase(FirebaseUrl+'users');
+var connectedRef = new Firebase(FirebaseUrl+'.info/connected');
+```
+
+{x: create users setonline}
+Create a `setOnline` function for our `Users` service.
+
+```javascript
+setOnline: function(uid){
+  var connected = $firebaseObject(connectedRef);
+  var online = $firebaseArray(usersRef.child(uid+'/online'));
+
+  connected.$watch(function (){
+    if(connected.$value === true){
+      online.$add(true).then(function(connectedRef){
+        connectedRef.onDisconnect().remove();
+      });
+    }
+  });
+}
+```
+
+This function watches for changes at the `.info/connected` node and will `$add`
+any open connections to a `$firebaseArray` keyed under `online` within the
+user's profile. This allows us to track multiple connections (in case the user
+has multiple browser windows open), which will get removed when the client
+disconnects.
+
+{x: set online state}
+In `app/channels/channels.controller.js` set the current user as online.
+
+```javascript
+Users.setOnline(profile.$id);
+```
+
+{x: update logout}
+Update our logout function to wipe out the `online` array when the user logs out
+
+```javascript
+channelsCtrl.logout = function(){
+  channelsCtrl.profile.online = null;
+  channelsCtrl.profile.$save().then(function(){
+    Auth.$unauth();
+    $state.go('home');
+  });
+};
+```
+
+{x: add user info presence}
+Add a presence icon next to the current user's display name in
+`app/channels/index.html`
+
+```html
+<div class="user-name">
+  <span class="presence" ng-class="{online: channelsCtrl.profile.online}"></span>
+  {{ channelsCtrl.profile.displayName }}
+</div>
+```
+
+We're also dynamically adding the `online` class to the span tag using
+`ng-class`, based on if the `$firebaseArray` containing connections in the
+profile is present.
+
+{x: add user list presence}
+Add a presence icon next to the current user's display name in
+`app/channels/index.html`
+
+```html
+<a ng-if="user.$id !== channelsCtrl.profile.$id" ui-sref="channels.direct({uid: user.$id})" ui-sref-active="selected">
+  <span class="presence" ng-class="{online: user.online}"></span>
+  {{ user.displayName }}
+</a>
+```
+
+We're now able to see when our users are online! Our application is almost
+ready for production. In the next sections we will go over securing our data
+and deploying our application live.
+
+# Securing Your Data with Security Rules
+
+When you first create a Firebase, the default security rules allow full read
+and write access. While this makes it a lot easier to get started developing,
+it's always strongly recommended that you create security rules to make sure
+that your data stays consistent and secured. There are three kinds of rules,
+`.read`, `.write`, and `.validate` for controlling access and validating your
+data.
+
+{x: read firebase security docs}
+Read the [Firebase Documentation on Security](https://www.firebase.com/docs/web/guide/structuring-data.html)
+
+{x: add security rules}
+Open up your Firebase Forge (the `FirebaseUrl` constant in `app/app.js`) and
+add the following rules under the Security & Rules section of the dashboard.
+
+```javascript
+{
+  "rules":{
+    ".read": true,
+    "users":{
+      "$uid":{
+        ".write": "auth !== null && $uid === auth.uid",
+        "displayName":{
+          ".validate": "newData.exists() && newData.val().length > 0"
+        },
+        "online":{
+          "$connectionId":{
+            ".validate": "newData.isBoolean()"
+          }
+        }
+      }
+    },
+    "channels":{
+      "$channelId":{
+        ".write": "auth !== null",
+        "name":{
+          ".validate": "newData.exists() && newData.isString() && newData.val().length > 0"
+        }
+      }
+    },
+    "channelMessages":{
+      "$channelId":{
+        "$messageId":{
+          ".write": "auth !== null && newData.child('uid').val() === auth.uid",
+          ".validate": "newData.child('timestamp').exists()",
+          "body":{
+            ".validate": "newData.exists() && newData.val().length > 0"
+          }
+        }
+      }
+    },
+    "userMessages":{
+      "$uid1":{
+        "$uid2":{
+          "$messageId":{
+            ".read": "auth !== null && ($uid1 === auth.uid || $uid2 === auth.uid)",
+            ".write": "auth !== null && newData.child('uid').val() === auth.uid",
+            ".validate": "$uid1 < $uid2 && newData.child('timestamp').exists()",
+            "body":{
+              ".validate": "newData.exists() && newData.val().length > 0"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+# Deploying to Firebase
+
+{x: install firebase tools}
+Run `npm install -g firebase-tools` to install the Firebase command line tool
+
+{x: create firebase json}
+In the root of your codebase, create the following file named `firebase.json`,
+filling in the name of your Firebase:
+
+```javascript
+{
+  "firebase": "firebase-name-here",
+  "public": "dist"
+}
+```
+
+{x: run grunt build}
+Run `grunt build` to build a production-ready version of our application into
+the `dist` folder
+
+{x: run firebase deploy}
+Run `firebase deploy` in the root of your codebase.
+
+`firebase deploy` may prompt you to log in, but afterwards it should push your
+application to Firebase's hosting service. Now if you visit
+https://firebase-name-here.firebaseapp.com/ you should see our completed app,
+ready for the world to use!

@@ -1,0 +1,9 @@
+{
+  "firebase": "pingpad",
+  "public": ".",
+  "ignore": [
+    "firebase.json",
+    "**/.*",
+    "**/node_modules/**"
+  ]
+}
