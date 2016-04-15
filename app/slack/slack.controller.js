@@ -1,5 +1,5 @@
 angular.module('angularfireSlackApp')
-  .controller('SlackCtrl', function ($http, $state,$firebaseArray, Auth, FirebaseUrl) {
+  .controller('SlackCtrl', function ($http, $state, $firebaseArray, Auth, FirebaseUrl) {
     var ref = new Firebase(FirebaseUrl + 'users');
     var channelsRef = new Firebase(FirebaseUrl + 'channels');
     var slackIndexRef = new Firebase(FirebaseUrl + 'slackUidIndex');
@@ -12,8 +12,8 @@ angular.module('angularfireSlackApp')
 
     //debugger;
     var slackCtrl = this;
-    slackCtrl.import = function () {
-      //debugger;
+    slackCtrl.import = function (teamName) {
+      debugger;
       $http({
         method: 'POST',
         url: "https://slack.com/api/channels.list?token=" + slackCtrl.token,
@@ -31,46 +31,19 @@ angular.module('angularfireSlackApp')
           for (i = 0; i < channels.length; i++) {
             slackChannelId = channels[i].id;
             var channelId = slackCtrl.team_id + '_' + slackChannelId;
-            var teamId = channels[i].team_id;
+            var teamId = slackCtrl.team_id;
+
+            slackCtrl.fetchPins(slackChannelId, teamId);
             channelsRef.child(channelId).update({
               name: channels[i].name,
               is_slack: true,
-              members_slack_uid: channels[i].members
+              members_slack_uid: channels[i].members,
+              team_name: teamName
             });
             userRef.child("channels").child(channelId).update({
               //is_slack: true,
               synced: (new Date().getTime())
               //name: channels[i].name
-            });
-
-            $http({
-              method: 'POST',
-              url: "https://slack.com/api/pins.list?token=" + slackCtrl.token + "&channel=" + slackChannelId,
-              headers: {
-                'Content-Type': undefined
-              },
-            }).then(function successCallback(response) {
-              // this callback will be called asynchronously
-              if (response.data.ok) {
-                var pins = response.data.items;
-                for (var i in pins) {
-                  if (pins[i].type == 'message') {
-                    pins[i].message;
-                    //channel": "C2147483705",
-                    //"message": {...},
-                    //"created": 1456335673
-                    var channelNotes = channelNotesRef.child(channelId);
-                    $firebaseArray(channelNotes).$add({
-                      uid: Auth.$getAuth().uid,
-                      body: pins[i].message.text,
-                      channelId: slackChannelId,
-                      timestamp: Firebase.ServerValue.TIMESTAMP
-                    });
-
-                  }
-                }
-              }
-            }, function errorCallback(response) {
             });
 
           }
@@ -83,7 +56,50 @@ angular.module('angularfireSlackApp')
       });
 
     }
+    slackCtrl.fetchPins = function (slackChannelId, teamId) {
+      //debugger;
+      var channelId = teamId + '_' + slackChannelId;
+      $http({
+        method: 'POST',
+        url: "https://slack.com/api/pins.list?token=" + slackCtrl.token + "&channel=" + slackChannelId,
+        headers: {
+          'Content-Type': undefined
+        },
+      }).then(function successCallback(response) {
+        // this callback will be called asynchronously
+        if (response.data.ok) {
+          //debugger;
+          var pins = response.data.items;
+          for (var i in pins) {
+            if (pins[i].type == 'message') {
+              var channelNotes = channelNotesRef.child(channelId).child(pins[i].created).update({
+                uid: Auth.$getAuth().uid,
+                body: pins[i].message.text,
+                channelId: channelId,
+                imported: new Date().getTime(),
+                type: 'slack_pinned_message',
+                title: pins[i].message.text,
+                timestamp: Firebase.ServerValue.TIMESTAMP
+              });
+            } else if (pins[i].type == 'file') {
+              debugger;
+              var channelNotes = channelNotesRef.child(channelId).child(pins[i].created).update({
+                uid: Auth.$getAuth().uid,
+                body: pins[i].file.permalink_public,
+                channelId: channelId,
+                imported: new Date().getTime(),
+                type: 'slack_pinned_file',
+                title: pins[i].file.title,
+                file_url: pins[i].file.permalink_public,
+                timestamp: Firebase.ServerValue.TIMESTAMP
+              });
+            }
+          }
+        }
+      }, function errorCallback(response) {
+      });
 
+    }
     slackCtrl.init = function () {
       var params = window.location.search.replace("?", "");
       var code = getUrlVars()["code"];
@@ -156,7 +172,7 @@ angular.module('angularfireSlackApp')
 
           slackCtrl.team_id = response.data.team_id;
           slackCtrl.team_name = response.data.team_name;
-          slackCtrl.import();
+          slackCtrl.import(response.data.team);
           $state.go('home');
         }
       }, function errorCallback(response) {

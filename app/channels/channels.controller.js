@@ -40,13 +40,13 @@ angular.module('angularfireSlackApp')
         return 'error';
       }
     };
-    channelsCtrl.getDisplayName = function (channelId) {
+    channelsCtrl.getTeamName = function (channelId) {
 
       if (channelsArray.$getRecord(channelId)) {
-        return channelsArray.$getRecord(channelId).name;
+        return channelsArray.$getRecord(channelId).team_name;
       } else {
         //debugger;
-        return 'error';
+        //return 'error';
       }
     };
 

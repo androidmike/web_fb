@@ -13,19 +13,25 @@ angular.module('angularfireSlackApp')
     var channelsRef = new Firebase(FirebaseUrl + 'channels');
     channelArray = $firebaseArray(channelsRef);
 
-    workspaceCtrl.updateScroll = function()
-    {
+    workspaceCtrl.updateScroll = function () {
       //if (!scrolled) {
-      //debugger;
-      var element = document.getElementById('chat-container');
-        element.scrollTop = element.scrollHeight;
+      ////debugger;
+      //var element = document.getElementById('chat-container');
+      ////if (element != null) {
+      //  element.scrollTop = element.scrollHeight;
       //}
+      ////}
     }
 
     workspaceCtrl.getChannelName = function (channelId) {
       console.log(channelId);
       return channelArray.$getRecord(channelId).name;
     };
+
+    workspaceCtrl.shareLink = function () {
+      //$scope.$window.clipboardData.setData("Text", location.href);
+      alert("Link copied to clipboard!");
+    }
 
     workspaceCtrl.createNote = function () {
       workspaceCtrl.note = "New note";
@@ -107,5 +113,10 @@ angular.module('angularfireSlackApp')
         noteId: note,
         channelId: pid
       });
+    }
+
+    workspaceCtrl.isPinnedSlackNote = function(note) {
+      debugger;
+      return note.type == 'slack_pinned_message';
     }
   });

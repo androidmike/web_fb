@@ -174,6 +174,18 @@ angular
 
             }
             return title;
+          },
+          fileUrl: function ($stateParams, notes) {
+
+            var fileUrl = notes.$getRecord($stateParams.noteId).file_url;
+
+            return fileUrl;
+          },
+          thumb: function ($stateParams, notes) {
+
+            var fileUrl = notes.$getRecord($stateParams.noteId).thumb_80;
+
+            return fileUrl;
           }
         }
       })

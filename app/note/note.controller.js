@@ -1,5 +1,5 @@
 angular.module('angularfireSlackApp')
-  .controller('NoteCtrl', function (profile, channelName, noteId, channelId, messages, notes, title) {
+  .controller('NoteCtrl', function (profile, channelName, noteId, channelId, messages, notes, title, fileUrl, thumb) {
     var firepad;
     var noteCtrl = this;
     noteCtrl.noteId = noteId;
@@ -8,6 +8,8 @@ angular.module('angularfireSlackApp')
     noteCtrl.channelId = channelId;
     noteCtrl.message = '';
     noteCtrl.note = '';
+    noteCtrl.thumb = thumb;
+    noteCtrl.fileUrl = fileUrl;
     noteCtrl.notes = notes;
     noteCtrl.profile = profile;
     noteCtrl.title = title;
