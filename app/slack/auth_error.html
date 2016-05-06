@@ -1,0 +1,13 @@
+<div class="container">
+  <h1>Uh oh!</h1>
+  <img width="300px"
+       src="../images/sad_face.svg"/>
+
+  <div>That didn't work. Please make sure you have selected the right team.</div>
+  <div class="label" ng-bind="'Error Code: ' + slackCtrl.getError()"/>
+  <div>
+    <a style="margin-top:30px" class="btn btn-lg btn-pill btn-primary " ng-href="{{api_base_endpoint + 'login?uid=' + Auth.$getAuth().uid + '&redirect_uri=' + api_base_endpoint + 'oauth'}}">
+      Sign in with Slack
+    </a>
+  </div>
+</div>

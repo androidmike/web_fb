@@ -1,5 +1,5 @@
 angular.module('angularfireSlackApp')
-  .controller('NoteCtrl', function (profile, channelName, noteId, channelId, messages, notes, title, fileUrl, thumb) {
+  .controller('NoteCtrl', function ($state, profile, channelName, noteId, channelId, messages, notes, title, fileUrl, thumb) {
     var firepad;
     var noteCtrl = this;
     noteCtrl.noteId = noteId;
@@ -15,8 +15,18 @@ angular.module('angularfireSlackApp')
     noteCtrl.title = title;
     noteCtrl.showTitleChangeButton = false;
 
+    var userPresenceRef = new Firebase('https://pingpad.firebaseio.com/userPresence/' + noteCtrl.noteId);
     var firepadRef = new Firebase('https://pingpad.firebaseio.com/notes/' + noteCtrl.noteId);
     var summaryRef = new Firebase('https://pingpad.firebaseio.com/channelNotes/' + noteCtrl.channelId + '/' + noteCtrl.noteId);
+
+    var notificationRef = new Firebase('https://pingpad.firebaseio.com/slackNotifications/' + noteCtrl.channelId + '/' + noteCtrl.noteId);
+
+    noteCtrl.goToChannel = function() {
+
+      $state.go('channels.home', {
+        channelId: channelId
+      });
+    };
 
     noteCtrl.changeTitle = function () {
       debugger;
@@ -37,6 +47,7 @@ angular.module('angularfireSlackApp')
     };
 
     noteCtrl.init = function () {
+
       //// Initialize Firebase.
       //// Create CodeMirror (with lineWrapping on).
       var codeMirror = CodeMirror(document.getElementById('firepad'), {lineWrapping: true});
@@ -50,8 +61,8 @@ angular.module('angularfireSlackApp')
         {richTextToolbar: true, richTextShortcuts: true, userId: userId});
 
       //// Create FirepadUserList (with our desired userId).
-      var firepadUserList = FirepadUserList.fromDiv(firepadRef.child('users'),
-        document.getElementById('userlist'), userId, noteCtrl.profile.displayName);
+      //var firepadUserList = FirepadUserList.fromDiv(firepadRef.child('users'),
+      //  document.getElementById('userlist'), userId, noteCtrl.profile.displayName);
 
       $('[contenteditable]').on('focus', function() {
         var $this = $(this);
@@ -72,17 +83,13 @@ angular.module('angularfireSlackApp')
       firepad.on('ready', function () {
         if (firepad.isHistoryEmpty()) {
           firepadRef.child('channel_notes').child(channelId).child(noteId).once("value", function (r) {
-              //debugger;
-              //var title = r.val().body;
-              //alert(title);
+
             }
           );
           //firepad.setText(firepadRef.child('channel_notes').child(channelId).child(noteId).$body);
         }
         //
       });
-
-
       firepad.on('synced', function (isSynced) {
         // isSynced will be false immediately after the user edits the pad,
         // and true when their edit has been saved to Firebase.
@@ -106,6 +113,14 @@ angular.module('angularfireSlackApp')
         var txt = firepad.getText();
         //$('.firepad-unchecked').text( $str1.find('p').eq(1).text() );
         summaryRef.update({text: txt, last_user_synced: profile.$id});
+
+        //notificationRef.child("latest_user").update({time: new Date().getTime()/1000, displayName: profile.displayName, uid: profile.$id});
+
+        notificationRef.update({latest_user_time: new Date().getTime()/1000, latest_user_display_name: profile.displayName, latest_uid: profile.$id});
+
+        var uid = profile.$id;
+
+        //userPresenceRef.child("typing").child(profile.$id).update({last_seen : (new Date().getTime()/1000)});
       });
 
     };

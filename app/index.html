@@ -1,21 +1,35 @@
 <!doctype html>
 <html class="no-js">
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="utf-8">
     <title>Pingpad</title>
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width">
-    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-    <!-- build:css(.) styles/vendor.css -->
-    <!-- bower:css -->
-    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
-    <!-- endbower -->
-    <!-- endbuild -->
-    <!-- build:css(.tmp) styles/main.css -->
-    <link rel="stylesheet" href="styles/main.css">
-    <!-- endbuild -->
+    <meta name="description" content="descript">
+
+    <style>
+      /* note: this is a hack for ios iframe for bootstrap themes shopify page */
+      /* this chunk of css is not part of the toolkit :) */
+      body {
+        width: 1px;
+        min-width: 100%;
+        *width: 100%;
+      }
+    </style>
+    <script>(function(){var w=window;var ic=w.Intercom;if(typeof ic==="function"){ic('reattach_activator');ic('update',intercomSettings);}else{var d=document;var i=function(){i.c(arguments)};i.q=[];i.c=function(args){i.q.push(args)};w.Intercom=i;function l(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://widget.intercom.io/widget/fke30fr8';var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);}if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}}})()</script>
+    <script>
+      window.intercomSettings = {
+        app_id: "fke30fr8",
+//        name: "Jane Doe", // Full name
+//        email: "customer@example.com", // Email address
+//        created_at: 1312182000 // Signup date as a Unix timestamp
+      };
+    </script>
+    <script>(function(){var w=window;var ic=w.Intercom;if(typeof ic==="function"){ic('reattach_activator');ic('update',intercomSettings);}else{var d=document;var i=function(){i.c(arguments)};i.q=[];i.c=function(args){i.q.push(args)};w.Intercom=i;function l(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://widget.intercom.io/widget/g5wm0ems';var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);}if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}}})()</script>
+
   </head>
+
   <body ng-app="angularfireSlackApp">
+
     <!--[if lt IE 7]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
@@ -33,9 +47,8 @@
        ga('create', 'UA-XXXXX-X');
        ga('send', 'pageview');
     </script>
-
-    <script src="https://npmcdn.com/masonry-layout@4.0/dist/masonry.pkgd.min.js"></script>
     <!-- build:js(.) scripts/vendor.js -->
+
     <!-- bower:js -->
     <script src="bower_components/jquery/dist/jquery.js"></script>
     <script src="bower_components/angular/angular.js"></script>
@@ -57,9 +70,6 @@
     <link href='https://fonts.googleapis.com/css?family=Lato:400,100,300,700' rel='stylesheet' type='text/css'>
     <script src="firepad-userlist.js"></script>
     <link rel="stylesheet" href="styles/firepad-userlist.css" />
-    <link rel="stylesheet" href="styles/google-now.css" />
-
-    <script src="./masonry.pkgd.min.js"></script>
 
     <!-- build:js({.tmp,app}) scripts/scripts.js -->
     <script src="app.js"></script>
@@ -70,14 +80,49 @@
     <script src="channels/channels.controller.js"></script>
     <script src="channels/channels.service.js"></script>
     <script src="channels/messages.service.js"></script>
-
     <script src="channels/accessible_channels.service.js"></script>
     <script src="channels/workspace.controller.js"></script>
     <script src="note/notes.service.js"></script>
     <script src="note/note.controller.js"></script>
     <script src="slack/slack.controller.js"></script>
-    <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
     <!-- endbuild -->
 
+    <!-- Get bootstrap theme -->
+    <!--<script src="../docs/assets/js/jquery.min.js"></script>-->
+    <script src="../docs/assets/js/chart.js"></script>
+    <script src="../docs/assets/js/tablesorter.min.js"></script>
+    <script src="../docs/assets/js/toolkit.js"></script>
+    <script src="../docs/assets/js/application.js"></script>
+
+
+
+    <script src="./masonry.pkgd.min.js"></script>
+    <link href='https://fonts.googleapis.com/css?family=Lato:400,400italic,700,900,700italic' rel='stylesheet' type='text/css'>
+
+    <link href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic" rel="stylesheet">
+    <link href='https://fonts.googleapis.com/css?family=Droid+Serif:700,400,700italic,400italic' rel='stylesheet' type='text/css'>
+    <link href="assets/css/toolkit-light.css" rel="stylesheet">
+    <link href="assets/css/application.css" rel="stylesheet">
+    <link href="styles/custom_bootstrap.css" rel="stylesheet">
+    <script src="https://use.typekit.net/hxd7sxm.js"></script>
+    <script>try{Typekit.load({ async: true });}catch(e){}</script>
+    <style>
+      /* note: this is a hack for ios iframe for bootstrap themes shopify page */
+      /* this chunk of css is not part of the toolkit :) */
+      body {
+        width: 1px;
+        min-width: 100%;
+        *width: 100%;
+      }
+    </style>
+    <script>
+      // execute/clear BS loaders for docs
+      $(function () {
+        while (window.BS && window.BS.loader && window.BS.loader.length) {
+          (window.BS.loader.pop())()
+        }
+      })
+    </script>
   </body>
+
 </html>

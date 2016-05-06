@@ -21,7 +21,7 @@ var FirepadUserList = (function () {
     });
 
     this.userList_ = this.makeUserList_()
-    place.appendChild(this.userList_);
+    //place.appendChild(this.userList_);
   }
 
   // This is the primary "constructor" for symmetry with Firepad.
@@ -65,6 +65,14 @@ var FirepadUserList = (function () {
       var color = colorSnapshot.val();
       if (isValidColor(color)) {
         colorDiv.style.backgroundColor = color;
+        var img = new Image();
+        var div = document.getElementsByClassName('firepad-userlist-color-indicator');
+//debugger;
+        img.onload = function() {
+          //div.appendChild(img);
+        };
+
+        img.src = 'https://www.gravatar.com/avatar/bcb7895d223afb465329e5c352bd86f0?s=32&d=identicon&r=PG';
       }
     });
     this.firebaseOn_(myUserRef.child('cursor'), 'value', function (snapshot) {
@@ -72,7 +80,7 @@ var FirepadUserList = (function () {
       var cursor = snapshot.val();
       cursor.position;
       cursor.selectionEnd;
-      console.log("Current Position: " + cursor.position);
+      //console.log("Current Position: " + cursor.position);
       colorDiv.style.marginTop = cursor.position;
 
     });

@@ -8,12 +8,19 @@
  *
  * Main module of the application.
  */
+
 angular
   .module('angularfireSlackApp', [
     'firebase',
     'angular-md5',
     'ui.router'
   ])
+  .run(function($rootScope) {
+    $rootScope.$on("$stateChangeError", console.log.bind(console));
+    $rootScope.RUN_LOCAL = false;
+    $rootScope.api_base_endpoint = $rootScope.RUN_LOCAL ? "http://0.0.0.0:8080/": "https://stone-ground-88022.appspot.com/";
+    //$rootScope.api_base_endpoint = "https://stone-ground-88022.appspot.com/";
+  })
   .config(function ($stateProvider, $urlRouterProvider) {
     $stateProvider
       .state('home', {
@@ -22,7 +29,7 @@ angular
         resolve: {
           requireNoAuth: function ($state, Auth) {
             return Auth.$requireAuth().then(function (auth) {
-              $state.go('channels');
+              $state.go('channels.home', {channelId: 0});
             }, function (error) {
               return;
             });
@@ -61,6 +68,7 @@ angular
       })
       .state('profile', {
         url: '/profile',
+        //controller: 'ProfileCtrl as profileCtrl',
         controller: 'ProfileCtrl as profileCtrl',
         templateUrl: 'users/profile.html',
         resolve: {
@@ -81,20 +89,13 @@ angular
         controller: 'SlackCtrl as slackCtrl',
         templateUrl: 'slack/callback.html',
         resolve: {
-          //requireNoAuth: function ($state, Auth) {
-          //  return Auth.$requireAuth().then(function (auth) {
-          //   //$state.go('');
-          //    });
-          //  }, function (error) {
-          //    //$state.go('home');
-          //  });
-          //},
-
-          //profile: function (Users, Auth) {
-          //  return Auth.$requireAuth().then(function (auth) {
-          //    return Users.getProfile(auth.uid).$loaded();
-          //  });
-          //}
+        }
+      })
+      .state('slack_error', {
+        url: '/slack_error',
+        controller: 'SlackCtrl as slackCtrl',
+        templateUrl: 'slack/auth_error.html',
+        resolve: {
         }
       })
       .state('channels', {
@@ -102,10 +103,16 @@ angular
         controller: 'ChannelsCtrl as channelsCtrl',
         templateUrl: 'channels/index.html',
         resolve: {
+          auth: function ($state, Users, Auth) {
+            return Auth.$requireAuth().catch(function () {
+              $state.go('home');
+            });
+          },
           channels: function (AccessibleChannels) {
             return AccessibleChannels.$loaded();
           },
           profile: function ($state, Auth, Users) {
+
             return Auth.$requireAuth().then(function (auth) {
               return Users.getProfile(auth.uid).$loaded().then(function (profile) {
                 if (profile.displayName) {
@@ -117,6 +124,10 @@ angular
             }, function (error) {
               $state.go('home');
             });
+          },
+          channelId: function(AccessibleChannels) {
+            console.log(AccessibleChannels.$loaded());
+            return AccessibleChannels.$loaded()[0];
           }
         }
       })
@@ -129,16 +140,19 @@ angular
 
       .state('channels.home', {
         url: '/{channelId}',
-        templateUrl: 'channels/workspace.html',
+        templateUrl: 'channels/note-listing.html',
         controller: 'MessagesCtrl as messagesCtrl',
         resolve: {
           messages: function ($stateParams, Messages) {
             return Messages.forChannel($stateParams.channelId).$loaded();
           },
           channelName: function ($stateParams, Channels) {
-            return '#' + Channels.$getRecord($stateParams.channelId).name;
+            //return '#' + Channels.$getRecord($stateParams.channelId).name;
+            return "";
           },
           channelId: function ($stateParams) {
+            //console.log("$stateParams.channelId");
+            //console.log($stateParams.channelId);
             return $stateParams.channelId;
           },
           notes: function ($stateParams, Notes) {
@@ -156,7 +170,8 @@ angular
             return Messages.forChannel($stateParams.channelId).$loaded();
           },
           channelName: function ($stateParams, Channels) {
-            return Channels.$getRecord($stateParams.channelId).name;
+            //return '#' + Channels.$getRecord($stateParams.channelId).name;
+            return "";
           },
           channelId: function ($stateParams) {
             return $stateParams.channelId;
@@ -192,7 +207,7 @@ angular
 
       .state('channels.direct', {
         url: '/{uid}/messages/direct',
-        templateUrl: 'channels/workspace.html',
+        templateUrl: 'channels/note-listing.html',
         controller: 'MessagesCtrl as messagesCtrl',
         resolve: {
           messages: function ($stateParams, Messages, profile) {
@@ -204,8 +219,9 @@ angular
             });
           }
         }
-      });
+      })
 
     $urlRouterProvider.otherwise('/');
   })
   .constant('FirebaseUrl', 'https://pingpad.firebaseio.com/');
+

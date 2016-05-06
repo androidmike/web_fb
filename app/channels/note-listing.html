@@ -1,0 +1,125 @@
+<div class="header" ng-init="messagesCtrl.init()">
+
+  <div class="dashhead">
+    <div class="dashhead-titles">
+      <h6 class="dashhead-subtitle" ng-bind="channelsCtrl.getTeamName(messagesCtrl.channelId)"></h6>
+
+      <h2 class="dashhead-title" ng-bind="channelsCtrl.getChannelName(messagesCtrl.channelId)"></h2>
+    </div>
+
+
+    <div class="btn-toolbar dashhead-toolbar">
+      <!--<div class="btn-toolbar-item input-with-icon">-->
+        <!--<input type="text" value="01/01/15 - 01/08/15" class="form-control" data-provide="datepicker">-->
+        <!--<span class="icon icon-calendar"></span>-->
+      <!--</div>-->
+    </div>
+
+  </div>
+
+  <button type="button" ng-click="messagesCtrl.createNote()" class="btn btn-primary">
+    <span class="icon icon-plus"></span>
+    New note
+  </button>
+  <!--<button type="button" class="btn btn-primary">-->
+    <!--<span class="icon"></span>-->
+    <!--Share group link-->
+  <!--</button>-->
+
+  <!--<button type="button" class="btn btn-danger-outline">-->
+    <!--<span class="icon icon-cog"></span>-->
+
+  <!--</button>-->
+
+  <hr class="m-t">
+  <!--<div ng-if="channelsCtrl.isSlackChannel(messagesCtrl.channelId)">-->
+    <!--<img src="./images/slack_black.png" style="margin-left: 20px;width: 22px; height: 22px"/> Slack Group-->
+  <!--</div>-->
+</div>
+
+<div class="channel-panes">
+  <div id="wrapper">
+    <div id="center-wrapper">
+      <div id="left">
+
+        <!--<a class="create-button btn btn-lg btn-default new-note"-->
+           <!--ng-if="channelsCtrl.isSlackChannel(messagesCtrl.channelId)">Slack Setting</a>-->
+
+        <div class="grid" style="clear:both;">
+          <div class="grid-item card" ng-repeat="note in messagesCtrl.notes">
+
+            <div style="overflow:hidden;" ng-click="channelsCtrl.goToNote(messagesCtrl.channelId, note)">
+              <div ng-if="note.type == 'slack_pinned_message'" style=" margin-left: 120px;
+ " > <span  class="icon icon-pin"/></div>
+              <!--<div class="statcard statcard-danger">-->
+                <!--<h3 class="statcard-number">-->
+                  <!--1,293-->
+
+                  <!--<small>Pinned Messages</small>-->
+                <!--</h3>-->
+                <!--<span class="statcard-desc">Sign-ups</span>-->
+              <!--</div>-->
+
+              <div ng-if="note.type == 'slack_pinned_file'" class="caption">Pinned File</div>
+
+              <h3 class="note-card-title" > {{ note.title }}</h3>
+
+              <div class="note-card-text"
+                   ng-click="channelsCtrl.goToNote(messagesCtrl.channelId, note)">
+                <div class="timestamp" >{{ workspaceCtrl.convertTime(note.timestamp)}}{{note.timestamp | date:'short' }}</div>
+                {{note.text}}
+              </div>
+            </div>
+
+            <!--<div class="type-icon" ng-if="note.type == 'slack_pinned_file'" ng-click="note.file_url"></div>-->
+            <a ng-if="note.type == 'slack_pinned_file'" href="{{note.file_url}}" class="file-type-icon"
+               style="margin-top:15px;">
+              <img width="36px"
+                   src="https://cdn1.iconfinder.com/data/icons/hawcons/32/699329-icon-57-document-download-128.png"></a>
+
+
+          </div>
+
+        </div>
+        <!--<div class="new-note-button">-->
+        <!--<button ng-click="messagesCtrl.createNote()">New Note</button>-->
+        <!--</div>-->
+
+      </div>
+      <!--<div id="right">-->
+        <!--<div style="clear: both; margin-bottom: 20px" ng-repeat="message in messagesCtrl.messages">-->
+          <!--<img style="float:left;" class="user-pic" ng-src="{{ channelsCtrl.getGravatar(message.uid) }}"/>-->
+
+          <!--<div style="float:left; margin-left:12px;">-->
+            <!--<div style="float:left;" class="user-name">-->
+              <!--{{ channelsCtrl.getDisplayName(message.uid) }}-->
+
+            <!--</div>-->
+            <!--<span style="float:left; margin-left:10px;" class="timestamp">{{ message.timestamp | date:'short' }}</span>-->
+
+            <!--<div class="message-info">-->
+
+
+              <!--<div class="message" style="clear:both;">-->
+                <!--{{ message.body }}{{messagesCtrl.updateScroll()}}-->
+              <!--</div>-->
+            <!--</div>-->
+          <!--</div>-->
+        <!--</div>-->
+
+        <!--<form class="message-form" ng-submit="messagesCtrl.sendMessage()">-->
+
+          <!--<div class="input-group">-->
+            <!--<input type="text" class="form-control" ng-model="messagesCtrl.message" placeholder="Type a message...">-->
+    <!--<span class="input-group-btn">-->
+      <!--<button class="btn btn-default" type="submit">Send</button>-->
+    <!--</span>-->
+          <!--</div>-->
+
+        <!--</form>-->
+      <!--</div>-->
+    </div>
+  </div>
+
+
+</div>

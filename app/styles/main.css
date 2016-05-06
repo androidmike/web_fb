@@ -1,6 +1,6 @@
 body {
   padding: 0;
-  font-family: 'Lato', sans-serif;
+  /*font-family: 'Lato', sans-serif;*/
 }
 
 .page-wrapper {
@@ -187,6 +187,9 @@ body {
   cursor: text;
   font-size: 20px;
   color: #333;
+  font-family: "ff-tisa-sans-web-pro",sans-serif;
+  font-style: normal;
+  font-weight: 700;
 }
 
 .message-pane .header h1 {
@@ -295,7 +298,7 @@ html, body {
   background: #f7ff2f;
 }
 
-.card {
+dd {
   -webkit-box-shadow: 0px 0px 2px 0px rgba(171, 171, 171, 1);
   -moz-box-shadow: 0px 0px 2px 0px rgba(171, 171, 171, 1);
   box-shadow: 0px 0px 2px 0px rgba(171, 171, 171, 1);

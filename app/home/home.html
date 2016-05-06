@@ -5,16 +5,28 @@
   </div>
 
   <p class="text-center">
-    <a ui-sref="login" class="btn btn-lg btn-default">Sign in with Email</a> or <a
-    href="https://slack.com/oauth/authorize?scope=incoming-webhook&client_id=2171299541.26487815974"><img
-    alt="Add to Slack" height="40" width="139" src="https://platform.slack-edge.com/img/add_to_slack.png"
-    srcset="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x"/></a>
 
-  <p class="text-center">
+    <!--<button ui-sref="login" class="btn btn-lg btn-pill btn-primary ">Sign in with Email</button>-->
+    <!--</p>-->
 
+
+    <!--<a-->
+    <!--href="https://slack.com/oauth/authorize?scope=incoming-webhook&client_id=2171299541.26487815974"><img-->
+    <!--alt="Add to Slack" height="40" width="139" src="https://platform.slack-edge.com/img/add_to_slack.png"-->
+    <!--srcset="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x"/></a>-->
+
+    <!--<p class="text-center">-->
+    <a class="btn btn-lg btn-pill btn-primary " ng-href="{{api_base_endpoint+'login?redirect_uri='+ api_base_endpoint + 'oauth';}}">
+      Sign in with Slack
+    </a>
+
+    <!--</p>-->
+
+    <!--<p class="text-center">-->
+
+    <!--<button ui-sref="register" class="btn btn-lg btn-pill btn-success ">Register</button>-->
+    <!--</p>-->
+    <!--<a ui-sref="register" class="btn btn-lg btn-primary">Register</a></p>-->
   </p>
 
-  <p class="text-center">
-    <a ui-sref="register" class="btn btn-lg btn-primary">Register</a></p>
-  </p>
 </div>

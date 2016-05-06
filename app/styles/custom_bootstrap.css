@@ -1,0 +1,91 @@
+
+.note-card-text {
+  color: #666;
+  font-weight: 300;
+
+  font-size: 14px;
+  /*overflow: hidden;*/
+  max-height: 600px;
+
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 13; /* number of lines to show */
+  /*line-height: 12px;        /!* fallback *!/*/
+  /*max-height: 12*20;       /!* fallback *!/*/
+}
+
+.label {
+  color: #999999;
+  font-weight: 300;
+}
+.timestamp {
+  color: #999999;
+  font-weight: 300;
+  margin-bottom: 10px;
+}
+
+.card {
+  -webkit-box-shadow: 0px 0px 2px 0px rgba(171, 171, 171, 1);
+  -moz-box-shadow: 0px 0px 2px 0px rgba(171, 171, 171, 1);
+  box-shadow: 0px 0px 2px 0px rgba(171, 171, 171, 1);
+  cursor: pointer;
+  border: 1px solid #ccc;
+  margin: 5px;
+  padding: 20px 20px 20px 20px;
+  width: 250px;
+  float:left;
+  /*max-height: 400px;*/
+  height: 370px;
+  /*overflow: hidden;*/
+}
+.card-large {
+  -webkit-box-shadow: 0px 0px 2px 0px rgba(171, 171, 171, 1);
+  -moz-box-shadow: 0px 0px 2px 0px rgba(171, 171, 171, 1);
+  box-shadow: 0px 0px 2px 0px rgba(171, 171, 171, 1);
+  border: 1px solid #ccc;
+  padding: 20px 20px 20px 20px;
+  /*max-height: 600px;*/
+}
+.username {
+  color: #ffffff;
+}
+.img-circle {
+  border-radius: 50%;
+}
+
+.caption {
+  font-family: "ff-tisa-sans-web-pro",sans-serif;
+  font-style: normal;
+  font-weight: 700;
+}
+.row {
+  margin-left: 0;
+  margin-right: 0;
+}
+.caret {
+  border: 5px solid transparent;
+  display: inline-block;
+  width: 0;
+  height: 0;
+  opacity: 0.5;
+  vertical-align: top;
+}
+.caret.up {
+  border-bottom: 5px solid;
+}
+.caret.right {
+  border-left: 5px solid;
+}
+.caret.down {
+  border-top: 5px solid;
+}
+.caret.left {
+  border-right: 5px solid;
+}
+
+.nav-header {
+  margin-top: 20px;
+}

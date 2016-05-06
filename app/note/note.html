@@ -1,12 +1,21 @@
-<div class="header" style="font-weight:300; font-size: 20px; padding-top: 27px" ng-init="noteCtrl.init()">
-  {{ noteCtrl.channelName }}
-</div>
 <div>
-<span id="title" style="  outline-width: 1px;  outline-color: #888888; display: inline-block;" class="title modifying"
-      contenteditable="true">
-  <h3 id="title_text" ng-bind="noteCtrl.title">
-  </h3> </span>
+  <b class="caret left" style="float:left; margin-right: 5px; margin-bottom: 3px;"></b><h6 class="dashhead-subtitle"
+                                                                                           ng-click="noteCtrl.goToChannel()"
+                                                                                           style="margin-bottom: 10px"
+                                                                                           ng-bind="noteCtrl.channelName"></h6>
+  {{noteCtrl.channelName}}
+</div>
+<div class="card-large" ng-init="noteCtrl.init()">
 
+
+  <!--<button type="button" >Save</button>-->
+  <div>
+    <div id="title_text" class="h2 sans dashhead-title" ng-bind="noteCtrl.title"
+         style="  outline-width: 0px;  outline-color: #888888; display: inline-block;"
+         class="title modifying"
+         contenteditable="true">
+    </div>
+  </div>
   <div>
     <a class="btn btn-md btn-default" ng-if="noteCtrl.fileUrl" href="{{noteCtrl.fileUrl}}">Download</a>
     <a class="btn btn-md btn-default" ng-if="noteCtrl.fileUrl" href="{{noteCtrl.fileUrl}}">Copy Link</a>
@@ -16,16 +25,24 @@
     <!--<a class="create-button btn btn-sm btn-default" ng-click="noteCtrl.addTask()">-->
     <!--Add Task</a>-->
     <!--</div>-->
-    <div class="channel-panes">
+    <!--<div class="channel-panes">-->
+    <!--<row>-->
+    <!--<div class="channel-panes">-->
 
-      <!--<div class="channel-panes">-->
-      <div id="userlist" style="float:left"></div>
-      <div id="firepad" style="float:left"></div>
-      <!--</div>-->
-    </div>
+    <!--<div style="display:flex; flex-direction:vertical;">-->
+    <!--<div style="flex: 1; overflow: auto;">-->
+    <div id="firepad"></div>
+    <!--</div>-->
+    <!--</div>-->
+
+
+    <!--<div id="userlist" class="col-md-2"></div>-->
+    <!--</row>-->
+    <!--</div>-->
+    <!--</div>-->
   </div>
   <script>
 
   </script>
-
+</div>
 

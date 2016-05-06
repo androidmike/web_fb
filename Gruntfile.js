@@ -178,7 +178,7 @@ module.exports = function (grunt) {
     // Automatically inject Bower components into the app
     wiredep: {
       app: {
-        src: ['<%= yeoman.app %>/index.html'],
+        src: ['<%= yeoman.app %>/index_backup.html'],
         ignorePath:  /\.\.\//
       },
       test: {
@@ -215,7 +215,7 @@ module.exports = function (grunt) {
     // concat, minify and revision files. Creates configurations in memory so
     // additional tasks can operate on them
     useminPrepare: {
-      html: '<%= yeoman.app %>/index.html',
+      html: '<%= yeoman.app %>/index_backup.html',
       options: {
         dest: '<%= yeoman.dist %>',
         flow: {
@@ -244,7 +244,7 @@ module.exports = function (grunt) {
     },
 
     // The following *-min tasks will produce minified files in the dist folder
-    // By default, your `index.html`'s <!-- Usemin block --> will take care of
+    // By default, your `index_backup.html`'s <!-- Usemin block --> will take care of
     // minification. These next options are pre-configured if you do not wish
     // to use the Usemin blocks.
     // cssmin: {

@@ -14,6 +14,14 @@ angular.module('angularfireSlackApp')
           var userRef = usersRef.child(Auth.$getAuth().uid);
           var slackToken = $stateParams.slack_token;
           userRef.update({slack_token: slackToken});
+
+          window.Intercom("boot", {
+            app_id: fke30fr8,
+            name: "Jane Doe", // Full name
+            email: "customer@example.com", // Email address
+            created_at: 1312182000 // Signup date as a Unix timestamp
+          });
+
         } else {
           // TODO LOG ERROR, go to right tsate
         }
